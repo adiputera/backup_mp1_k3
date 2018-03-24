@@ -9,110 +9,87 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.Size;
-
-import com.sun.istack.NotNull;
+import javax.persistence.Table;
 
 @Entity
-public class Role {
+@Table(name="adjustment_detail")
+public class AdjustmentDetail {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	private long id;
-	
-	@Column(nullable=true)
-	@Size(max=50)
-	private String name;
-
-	@Column(nullable=true)
-	@Size(max=250)
-	private String description;
-	
-	// created by
+	@Column(name="in_stock")
+	private int inStock;
+	@Column(name="actual_stock")
+	private int actualStock;
 	@ManyToOne
-	@JoinColumn(name="created_by", nullable=true)
+	@JoinColumn(name="created_by")
 	private User createdBy;
-	
-	@Temporal(TemporalType.DATE)
-	@Column(nullable=true, name="created_on")
+	@Column(name="created_on")
 	private Date createdOn;
-	
-	// modified by
 	@ManyToOne
-	@JoinColumn(name="modified_by",nullable=true)
+	@JoinColumn(name="modified_by")
 	private User modifiedBy;
-	
-	@Temporal(TemporalType.DATE)
-	@Column(nullable=true, name="modified_on")
+	@Column(name="modified_on")
 	private Date modifiedOn;
+	@ManyToOne
+	private Adjustment adjustment;
+	@ManyToOne
+	private ItemVariant variant;
 	
-	@NotNull
-	@Column(nullable=false)
-	private boolean active;
-
 	public long getId() {
 		return id;
 	}
-
 	public void setId(long id) {
 		this.id = id;
 	}
-
-	public String getName() {
-		return name;
+	public int getInStock() {
+		return inStock;
 	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setInStock(int inStock) {
+		this.inStock = inStock;
 	}
-
-	public String getDescription() {
-		return description;
+	public int getActualStock() {
+		return actualStock;
 	}
-
-	public void setDescription(String description) {
-		this.description = description;
+	public void setActualStock(int actualStock) {
+		this.actualStock = actualStock;
 	}
-
 	public User getCreatedBy() {
 		return createdBy;
 	}
-
 	public void setCreatedBy(User createdBy) {
 		this.createdBy = createdBy;
 	}
-
 	public Date getCreatedOn() {
 		return createdOn;
 	}
-
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;
 	}
-
 	public User getModifiedBy() {
 		return modifiedBy;
 	}
-
 	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
-
 	public Date getModifiedOn() {
 		return modifiedOn;
 	}
-
 	public void setModifiedOn(Date modifiedOn) {
 		this.modifiedOn = modifiedOn;
 	}
-
-	public boolean isActive() {
-		return active;
+	public Adjustment getAdjustment() {
+		return adjustment;
 	}
-
-	public void setActive(boolean active) {
-		this.active = active;
+	public void setAdjustment(Adjustment adjustment) {
+		this.adjustment = adjustment;
 	}
+	public ItemVariant getVariant() {
+		return variant;
+	}
+	public void setVariant(ItemVariant variant) {
+		this.variant = variant;
+	}
+	
 }

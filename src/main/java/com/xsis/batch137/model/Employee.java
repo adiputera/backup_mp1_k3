@@ -44,7 +44,7 @@ public class Employee {
 	
 	@Email
 	@Size(min=1, max=50, message="Harus 1-50 karakter")
-	@Column(nullable=true)
+	@Column(nullable=true, unique=true)
 	private String email;
 	
 	@Column(nullable=true)
@@ -78,6 +78,9 @@ public class Employee {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval=true)
 	private List<EmployeeOutlet> empOutlet;
 
+	@OneToOne(fetch = FetchType.LAZY, mappedBy="employee", cascade = CascadeType.ALL)
+	private User user;
+	
 	public long getId() {
 		return id;
 	}
@@ -172,5 +175,13 @@ public class Employee {
 
 	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 }

@@ -7,59 +7,44 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.xsis.batch137.model.Employee;
+import com.xsis.batch137.model.AdjustmentDetail;
 
 @Repository
-public class EmployeeDaoImpl implements EmployeeDao {
+public class AdjustmentDetailDaoImpl implements AdjustmentDetailDao {
 
 	@Autowired
 	SessionFactory sessionFactory;
 	
-	public void save(Employee emp) {
+	public void save(AdjustmentDetail adjDetail) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.save(emp);
+		session.save(adjDetail);
 		session.flush();
 	}
 
-	public void update(Employee emp) {
+	public void update(AdjustmentDetail adjDetail) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.update(emp);
+		session.update(adjDetail);
 		session.flush();
 	}
 
-	public void delete(Employee emp) {
+	public void delete(AdjustmentDetail adjDetail) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.delete(emp);
+		session.delete(adjDetail);
 		session.flush();
 	}
 
-	public List<Employee> selectAll() {
+	public List<AdjustmentDetail> selectAll() {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "from Employee where active = 1";
-		List<Employee> emps =  session.createQuery(hql).list();
-		if(emps == null) {
-			return null;
-		}
-		return emps;
+		return session.createCriteria(AdjustmentDetail.class).list();
 	}
 
-	public Employee getOne(Employee emp) {
+	public AdjustmentDetail getOne(long id) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		return session.get(Employee.class, emp.getId());
+		return session.get(AdjustmentDetail.class, id);
 	}
-
-	public void nonaktif(long id) {
-		// TODO Auto-generated method stub
-		Session session = sessionFactory.getCurrentSession();
-		String hql = "update Employee set active=0 where id = :id";
-		session.createQuery(hql).setParameter("id", id).executeUpdate();
-		session.flush();
-	}
-
-	
 }

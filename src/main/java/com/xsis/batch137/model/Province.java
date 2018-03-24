@@ -49,18 +49,17 @@ public class Province {
 	private Date modifiedOn;
 
 	@NotNull
-	@NotEmpty
 	@Column(nullable=false)
 	private boolean active;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "province", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Region> regions;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "provinceId", cascade = CascadeType.ALL)
-	private List<Supplier> supplier;
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "province", cascade = CascadeType.ALL)
+	private List<Supplier> suppliers;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "provinceId", cascade = CascadeType.ALL)
-	private List<Outlet> outlet;
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "province", cascade = CascadeType.ALL)
+	private List<Outlet> outlets;
 
 	public List<Region> getRegions() {
 		return regions;
@@ -119,19 +118,19 @@ public class Province {
 	}
 
 	public List<Supplier> getSupplier() {
-		return supplier;
+		return suppliers;
 	}
 
-	public void setSupplier(List<Supplier> supplier) {
-		this.supplier = supplier;
+	public void setSupplier(List<Supplier> suppliers) {
+		this.suppliers = suppliers;
 	}
 
 	public List<Outlet> getOutlet() {
-		return outlet;
+		return outlets;
 	}
 
-	public void setOutlet(List<Outlet> outlet) {
-		this.outlet = outlet;
+	public void setOutlet(List<Outlet> outlets) {
+		this.outlets = outlets;
 	}
 
 	public long getId() {

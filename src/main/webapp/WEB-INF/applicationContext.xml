@@ -36,11 +36,15 @@
 				<value>com.xsis.batch137.model.Role</value>
 				<value>com.xsis.batch137.model.Supplier</value>
 				<value>com.xsis.batch137.model.User</value>
+				<value>com.xsis.batch137.model.Customer</value>
+				<value>com.xsis.batch137.model.Adjustment</value>
+				<value>com.xsis.batch137.model.AdjustmentHistory</value>
+				<value>com.xsis.batch137.model.AdjustmentDetail</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
 			<props>
-				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.hbm2ddl.auto">create</prop>
 				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
 				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate5.SpringSessionContext

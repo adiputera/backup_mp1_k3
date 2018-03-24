@@ -31,6 +31,7 @@ public class Category {
 	@NotNull
 	@NotEmpty
 	@Size(max = 50)
+	@Column(nullable=false)
 	private String name;
 	
 	@Column(name = "created_on")
@@ -48,7 +49,7 @@ public class Category {
 	private Date modifiedOn;
 	
 	@NotNull
-	@NotEmpty
+	@Column(nullable=false)
 	private boolean active;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)

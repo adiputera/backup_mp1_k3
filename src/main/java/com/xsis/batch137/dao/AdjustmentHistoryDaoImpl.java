@@ -7,59 +7,45 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.xsis.batch137.model.Employee;
+import com.xsis.batch137.model.Adjustment;
+import com.xsis.batch137.model.AdjustmentHistory;
 
 @Repository
-public class EmployeeDaoImpl implements EmployeeDao {
+public class AdjustmentHistoryDaoImpl implements AdjustmentHistoryDao {
 
 	@Autowired
 	SessionFactory sessionFactory;
 	
-	public void save(Employee emp) {
+	public void save(AdjustmentHistory adjHistory) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.save(emp);
+		session.save(adjHistory);
 		session.flush();
 	}
 
-	public void update(Employee emp) {
+	public void update(AdjustmentHistory adjHistory) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.update(emp);
+		session.update(adjHistory);
 		session.flush();
 	}
 
-	public void delete(Employee emp) {
+	public void delete(AdjustmentHistory adjHistory) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.delete(emp);
+		session.delete(adjHistory);
 		session.flush();
 	}
 
-	public List<Employee> selectAll() {
+	public List<AdjustmentHistory> selectAll() {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "from Employee where active = 1";
-		List<Employee> emps =  session.createQuery(hql).list();
-		if(emps == null) {
-			return null;
-		}
-		return emps;
+		return session.createCriteria(AdjustmentHistory.class).list();
 	}
 
-	public Employee getOne(Employee emp) {
+	public AdjustmentHistory getOne(long id) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		return session.get(Employee.class, emp.getId());
+		return session.get(AdjustmentHistory.class, id);
 	}
-
-	public void nonaktif(long id) {
-		// TODO Auto-generated method stub
-		Session session = sessionFactory.getCurrentSession();
-		String hql = "update Employee set active=0 where id = :id";
-		session.createQuery(hql).setParameter("id", id).executeUpdate();
-		session.flush();
-	}
-
-	
 }

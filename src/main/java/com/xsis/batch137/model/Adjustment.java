@@ -9,110 +9,95 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.sun.istack.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
-public class Role {
+@Table(name="adjustment")
+public class Adjustment {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	private long id;
 	
-	@Column(nullable=true)
-	@Size(max=50)
-	private String name;
-
-	@Column(nullable=true)
-	@Size(max=250)
-	private String description;
-	
-	// created by
-	@ManyToOne
-	@JoinColumn(name="created_by", nullable=true)
-	private User createdBy;
-	
-	@Temporal(TemporalType.DATE)
-	@Column(nullable=true, name="created_on")
-	private Date createdOn;
-	
-	// modified by
-	@ManyToOne
-	@JoinColumn(name="modified_by",nullable=true)
-	private User modifiedBy;
-	
-	@Temporal(TemporalType.DATE)
-	@Column(nullable=true, name="modified_on")
-	private Date modifiedOn;
+	private String notes;
 	
 	@NotNull
+	@NotEmpty
 	@Column(nullable=false)
-	private boolean active;
-
+	@Size(max=20)
+	private String status;
+	
+	@JoinColumn(name="created_by")
+	@ManyToOne
+	private User createdBy;
+	
+	@Column(name="created_on")
+	private Date createdOn;
+	
+	@JoinColumn(name="modified_by")
+	@ManyToOne
+	private User modifiedBy;
+	
+	@Column(name="modified_on")
+	private Date modifiedOn;
+	
+	@ManyToOne
+	@NotNull
+	@NotEmpty
+	@JoinColumn(name="outlet_id", nullable=false)
+	private Outlet outlet;
+	
 	public long getId() {
 		return id;
 	}
-
 	public void setId(long id) {
 		this.id = id;
 	}
-
-	public String getName() {
-		return name;
+	public String getNotes() {
+		return notes;
 	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
-
-	public String getDescription() {
-		return description;
+	public String getStatus() {
+		return status;
 	}
-
-	public void setDescription(String description) {
-		this.description = description;
+	public void setStatus(String status) {
+		this.status = status;
 	}
-
 	public User getCreatedBy() {
 		return createdBy;
 	}
-
 	public void setCreatedBy(User createdBy) {
 		this.createdBy = createdBy;
 	}
-
 	public Date getCreatedOn() {
 		return createdOn;
 	}
-
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;
 	}
-
 	public User getModifiedBy() {
 		return modifiedBy;
 	}
-
 	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
-
 	public Date getModifiedOn() {
 		return modifiedOn;
 	}
-
 	public void setModifiedOn(Date modifiedOn) {
 		this.modifiedOn = modifiedOn;
 	}
-
-	public boolean isActive() {
-		return active;
+	public Outlet getOutlet() {
+		return outlet;
+	}
+	public void setOutlet(Outlet outlet) {
+		this.outlet = outlet;
 	}
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
 }

@@ -7,56 +7,45 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.xsis.batch137.model.Outlet;
+import com.xsis.batch137.model.Adjustment;
 
 @Repository
-public class OutletDaoImpl implements OutletDao{
+public class AdjustmentDaoImpl implements AdjustmentDao{
 
 	@Autowired
 	SessionFactory sessionFactory;
 
-	public void save(Outlet outlet) {
+	public void save(Adjustment adjustment) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.save(outlet);
+		session.save(adjustment);
 		session.flush();
 	}
 
-	public void update(Outlet outlet) {
+	public void update(Adjustment adjustment) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.update(outlet);
+		session.update(adjustment);
 		session.flush();
 	}
 
-	public void delete(Outlet outlet) {
+	public void delete(Adjustment adjustment) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.delete(outlet);
+		session.delete(adjustment);
 		session.flush();
 	}
 
-	public List<Outlet> selectAll() {
+	public List<Adjustment> selectAll() {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		return session.createCriteria(Outlet.class).list();
+		return session.createCriteria(Adjustment.class).list();
 	}
 
-	public Outlet getOne(long id) {
+	public Adjustment getOne(long id) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		return session.get(Outlet.class, id);
-	}
-
-	public List<Outlet> selectActive() {
-		// TODO Auto-generated method stub
-		Session session = sessionFactory.getCurrentSession();
-		String hql = "from Outlet where active = 1";
-		List<Outlet> outlets = session.createQuery(hql).list();
-		if(outlets == null) {
-			return null;
-		}
-		return outlets;
+		return session.get(Adjustment.class, id);
 	}
 	
 	

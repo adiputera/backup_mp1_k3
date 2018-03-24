@@ -49,7 +49,6 @@ public class Region {
 	private Date modifiedOn;
 
 	@NotNull
-	@NotEmpty
 	@Column(nullable=false)
 	private boolean active;
 
@@ -58,14 +57,17 @@ public class Region {
 	@NotNull
 	@NotEmpty
 	private Province province;
-
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Customer> customers;
+	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "region", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<District> districts;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "regionId", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "region", cascade = CascadeType.ALL)
 	private List<Supplier> supplier;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "regionId", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "region", cascade = CascadeType.ALL)
 	private List<Outlet> outlet;
 
 	public List<District> getDistricts() {

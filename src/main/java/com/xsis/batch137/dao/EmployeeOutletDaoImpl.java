@@ -7,58 +7,45 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.xsis.batch137.model.Employee;
+import com.xsis.batch137.model.EmployeeOutlet;
 
 @Repository
-public class EmployeeDaoImpl implements EmployeeDao {
+public class EmployeeOutletDaoImpl implements EmployeeOutletDao {
 
 	@Autowired
 	SessionFactory sessionFactory;
 	
-	public void save(Employee emp) {
+	public void save(EmployeeOutlet eo) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.save(emp);
+		session.save(eo);
 		session.flush();
 	}
 
-	public void update(Employee emp) {
+	public void update(EmployeeOutlet eo) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.update(emp);
+		session.update(eo);
 		session.flush();
 	}
 
-	public void delete(Employee emp) {
+	public void delete(EmployeeOutlet eo) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.delete(emp);
+		session.delete(eo);
 		session.flush();
 	}
 
-	public List<Employee> selectAll() {
+	public List<EmployeeOutlet> selectAll() {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "from Employee where active = 1";
-		List<Employee> emps =  session.createQuery(hql).list();
-		if(emps == null) {
-			return null;
-		}
-		return emps;
+		return session.createCriteria(EmployeeOutlet.class).list();
 	}
 
-	public Employee getOne(Employee emp) {
+	public EmployeeOutlet getOne(EmployeeOutlet eo) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		return session.get(Employee.class, emp.getId());
-	}
-
-	public void nonaktif(long id) {
-		// TODO Auto-generated method stub
-		Session session = sessionFactory.getCurrentSession();
-		String hql = "update Employee set active=0 where id = :id";
-		session.createQuery(hql).setParameter("id", id).executeUpdate();
-		session.flush();
+		return session.get(EmployeeOutlet.class, eo.getId());
 	}
 
 	
