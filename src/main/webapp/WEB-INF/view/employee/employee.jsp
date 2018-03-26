@@ -62,8 +62,8 @@
 					<td>${emp.haveAccount }</td>
 					<td>
 						<script type="text/javascript">
-							var data = [];
-							data = "${emp.empOutlet}"";
+							/* var data = [];
+							data = "${emp.empOutlet}""; */
 					        /* if( ${emp.empOutlet } != null ) {
 					            var data = ${emp.empOutlet};
 					        	$.each(data, function(i, item){
