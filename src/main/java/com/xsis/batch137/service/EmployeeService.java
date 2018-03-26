@@ -1,5 +1,6 @@
 package com.xsis.batch137.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import com.xsis.batch137.dao.EmployeeOutletDao;
 import com.xsis.batch137.dao.UserDao;
 import com.xsis.batch137.model.Employee;
 import com.xsis.batch137.model.EmployeeOutlet;
+import com.xsis.batch137.model.Outlet;
 import com.xsis.batch137.model.User;
 
 @Service
@@ -76,12 +78,16 @@ public class EmployeeService {
 	
 	public Employee getOne(long id) {
 		Employee emp = new Employee();
+		System.out.println("execute");
 		emp.setId(id);
 		emp.setFirstName("aaaaa");
 		emp.setLastName("aaaaa");
 		emp.setHaveAccount(true);
 		emp.setActive(false);
-		return empDao.getOne(emp);
+		Employee empss = empDao.getOne(emp);
+		List<EmployeeOutlet> empOUtlets = eoDao.getEmployeeOutletByEmployee(empss);
+		empss.setEmpOutlet(empOUtlets);
+		return empss;
 	}
 
 	public void nonaktif(long id) {

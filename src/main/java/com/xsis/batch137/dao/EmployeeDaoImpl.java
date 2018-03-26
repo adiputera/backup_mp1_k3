@@ -50,7 +50,9 @@ public class EmployeeDaoImpl implements EmployeeDao {
 	public Employee getOne(Employee emp) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		return session.get(Employee.class, emp.getId());
+		Employee em = session.get(Employee.class, emp.getId());
+		//session.flush();
+		return em;
 	}
 
 	public void nonaktif(long id) {

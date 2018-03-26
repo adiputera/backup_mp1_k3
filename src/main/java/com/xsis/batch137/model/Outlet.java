@@ -19,6 +19,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
 
 @Entity
@@ -45,15 +46,15 @@ public class Outlet {
 	private String phone;
 
 	@ManyToOne
-	@JoinColumn(name = "province_id", nullable=false)
+	@JoinColumn(name = "province_id", nullable=true)
 	private Province province;
 
 	@ManyToOne
-	@JoinColumn(name = "region_id", nullable=false)
+	@JoinColumn(name = "region_id", nullable=true)
 	private Region region;
 
 	@ManyToOne
-	@JoinColumn(name = "district_id", nullable=false)
+	@JoinColumn(name = "district_id", nullable=true)
 	private District district;
 
 	@Column(name = "postal_code")
@@ -79,7 +80,8 @@ public class Outlet {
 	private boolean active;
 
 	// relasi ke emp outlet
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "outlet", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "outlet", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<EmployeeOutlet> empOutlet;
 
 	// relate to itemInveroty

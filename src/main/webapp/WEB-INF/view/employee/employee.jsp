@@ -170,7 +170,9 @@
 				type : 'get',
 				dataType : 'json',
 				success : function(data){
-					console.log('sukses ambil data'),
+					console.log('sukses ambil data');
+					console.log(data);
+					alert('')/* 
 					$('#in-id').val(data.id);
 					$('#in-firstname').val(data.firstName);
 					$('#in-lastname').val(data.lastName);
@@ -186,7 +188,7 @@
 						$.each(data.empOutlet, function(){
 							$('input[name="in-outlet"][value="'+data.empOutlet.outlet.id+'"]').prop('checked', true);
 						})
-					}
+					} */
 				},
 				error : function(){
 					console.log('gagal')

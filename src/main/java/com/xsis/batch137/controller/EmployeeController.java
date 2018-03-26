@@ -75,6 +75,7 @@ public class EmployeeController {
 	@RequestMapping("/get-one/{id}")
 	@ResponseBody
 	public Employee getOne(@PathVariable long id) {
+		System.out.println("exeecute");
 		return empService.getOne(id);
 	}
 }
