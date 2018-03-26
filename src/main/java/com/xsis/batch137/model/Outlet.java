@@ -81,7 +81,6 @@ public class Outlet {
 
 	// relasi ke emp outlet
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "outlet", cascade = CascadeType.ALL)
-	@JsonManagedReference
 	private List<EmployeeOutlet> empOutlet;
 
 	// relate to itemInveroty

@@ -13,6 +13,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name="employee_outlet")
@@ -23,14 +25,12 @@ public class EmployeeOutlet {
 	private long id;
 	
 	@ManyToOne
-	//@Column()
-	//@JoinColumn(name="employee_id", nullable=true)
-	@JsonBackReference
+	@JoinColumn(name="employee_id", nullable=true)
+	@JsonIgnore
 	private Employee employee;
 	
-	@ManyToOne
-	@JsonBackReference
-	//@JoinColumn(name="outlet_id", nullable=true)
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="outlet_id", nullable=true)
 	private Outlet outlet;
 
 	public long getId() {

@@ -61,7 +61,18 @@
 					<td>${emp.email }</td>
 					<td>${emp.haveAccount }</td>
 					<td>
-			
+						<script type="text/javascript">
+							var data = [];
+							data = "${emp.empOutlet}"";
+					        /* if( ${emp.empOutlet } != null ) {
+					            var data = ${emp.empOutlet};
+					        	$.each(data, function(i, item){
+					        		document.write(data[i].outlet.id);
+					        	});
+					        } else {
+					            document.write("Tidak ada");
+					        } */
+					    </script>
 					</td>
 					<td>${emp.user.role.name }
 					<td><a href="#" key-id="${emp.id }" class="tblupdate btn btn-info">Edit</a> | 
@@ -172,23 +183,22 @@
 				success : function(data){
 					console.log('sukses ambil data');
 					console.log(data);
-					alert('')/* 
 					$('#in-id').val(data.id);
 					$('#in-firstname').val(data.firstName);
 					$('#in-lastname').val(data.lastName);
 					$('#in-title').val(data.title);
 					$('#in-email').val(data.email);
 					if(data.haveAccount == 1){
-						$('#cek-akun').prop('checkhed', true);
+						$('#cek-akun').prop('checked', true);
 						$('#in-username').val(data.user.username);
 						$('#in-password').val(data.user.password);
 						$('#pilih-role').val(data.user.role.id);
 					};
-					if(data.empOtlet!=null){
-						$.each(data.empOutlet, function(){
-							$('input[name="in-outlet"][value="'+data.empOutlet.outlet.id+'"]').prop('checked', true);
+					if(data.empOutlet!=null){
+						$.each(data.empOutlet, function(i, item){
+							$('input[name="in-outlet"][value="'+data.empOutlet[i].outlet.id+'"]').prop('checked', true);
 						})
-					} */
+					}
 				},
 				error : function(){
 					console.log('gagal')
