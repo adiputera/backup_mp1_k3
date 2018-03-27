@@ -22,6 +22,6 @@ public class EmployeeOutletController {
 	@RequestMapping
 	@ResponseBody
 	public List<EmployeeOutlet> getEmp() {
-		return null;
+		return eoService.getEmp();
 	}
 }

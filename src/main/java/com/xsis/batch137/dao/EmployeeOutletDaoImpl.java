@@ -20,7 +20,7 @@ public class EmployeeOutletDaoImpl implements EmployeeOutletDao {
 	public void save(EmployeeOutlet eo) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.save(eo);
+		session.saveOrUpdate(eo);
 		session.flush();
 	}
 

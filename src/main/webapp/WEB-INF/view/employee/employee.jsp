@@ -32,6 +32,7 @@
 					</select>
 				<td>
 				<td>
+					<input type="hidden" id="in-id-user">
 					<input type="text" placeholder="username" id="in-username" class="form-control">
 				</td>
 				<td>
@@ -59,22 +60,35 @@
 				<tr>
 					<td>${emp.firstName } ${emp.lastName }</td>
 					<td>${emp.email }</td>
-					<td>${emp.haveAccount }</td>
 					<td>
-						<script type="text/javascript">
-							/* var data = [];
-							data = "${emp.empOutlet}""; */
-					        /* if( ${emp.empOutlet } != null ) {
-					            var data = ${emp.empOutlet};
-					        	$.each(data, function(i, item){
-					        		document.write(data[i].outlet.id);
-					        	});
-					        } else {
-					            document.write("Tidak ada");
-					        } */
-					    </script>
+						<script>
+							if("${emp.haveAccount}" === "true" && "${emp.user.active}" === "true"){
+								document.write("&#10004;");
+							}else if("${emp.haveAccount}" === "false" && "${emp.user.active}" === "true"){
+								document.write("&#10004;");
+							}else{
+								document.write("&#10008;");
+							}
+						</script>
 					</td>
-					<td>${emp.user.role.name }
+					<td>
+						<ol>
+							<c:forEach items="${emp.empOutlet }" var="empo">
+								<li>${empo.outlet.name }</li>
+							</c:forEach>
+						</ol>
+					</td>
+					<td>
+						<script>
+							if("${emp.haveAccount}" === "true" && "${emp.user.active}" === "true"){
+									document.write("${emp.user.role.name }");
+								}else if("${emp.haveAccount}" === "false" && "${emp.user.active}" === "true"){
+									document.write("User Tidak Aktif");
+								}else{
+									document.write("Tidak Memiliki User");
+							}
+						</script>
+					</td>
 					<td><a href="#" key-id="${emp.id }" class="tblupdate btn btn-info">Edit</a> | 
 						<a href="#" key-id="${emp.id }" class="nonaktifkan btn btn-danger">&times;</a></td>
 				</tr>
@@ -166,6 +180,7 @@
 				url : '${pageContext.request.contextPath}/employee/nonaktif/'+ id,
 				type : 'GET',
 				success : function(response) {
+					window.location = '${pageContext.request.contextPath}/employee';
 					$('#konfirmdel').modal('hide');
 				},
 				error : function() {
@@ -190,6 +205,14 @@
 					$('#in-email').val(data.email);
 					if(data.haveAccount == 1){
 						$('#cek-akun').prop('checked', true);
+						$('#buat-akun').fadeIn('fast');
+						$('#in-id-user').val(data.user.id);
+						$('#in-username').val(data.user.username);
+						$('#in-password').val(data.user.password);
+						$('#pilih-role').val(data.user.role.id);
+					}else if(data.haveAccount == 0 && data.user.active == 1){
+						$('#cek-akun').prop('checked', false);
+						$('#buat-akun').fadeOut('fast');
 						$('#in-username').val(data.user.username);
 						$('#in-password').val(data.user.password);
 						$('#pilih-role').val(data.user.role.id);
@@ -226,8 +249,10 @@
 			{
 				var akun = 1;
 				usr = {
+					"id" : $('#in-id-user').val(),
 					"username" : $('#in-username').val(),
 					"password" : $('#in-password').val(),
+					"active" : 1,
 					"role" : {
 						"id" : $('#pilih-role').val()
 					}
@@ -256,6 +281,7 @@
 					contentType : 'application/json',
 					success : function() {
 						console.log('simpan');
+						window.location = '${pageContext.request.contextPath}/employee';
 					},
 					error : function() {
 						alert('save failed');

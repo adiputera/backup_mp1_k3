@@ -39,16 +39,35 @@ public class EmployeeService {
 		employee.setActive(emp.isActive());
 		empDao.save(employee);
 		
-		if(emp.getEmpOutlet()!=null) {
+		/*if(emp.getEmpOutlet()!=null) {
+		if(empos.isEmpty()) {
 			for(EmployeeOutlet eo : emp.getEmpOutlet()) {
 				EmployeeOutlet empOutlet = new EmployeeOutlet();
 				empOutlet.setEmployee(employee);
 				empOutlet.setOutlet(eo.getOutlet());
 				eoDao.save(empOutlet);
 			}
+			
+		}else {
+			for(EmployeeOutlet eo : emp.getEmpOutlet()) {
+				for(EmployeeOutlet empo : empos) {
+					long id1 = eo.getOutlet().getId();
+					long id2 = empo.getOutlet().getId();
+					if(id1==id2) {
+						
+					}else {
+						EmployeeOutlet empOutlet = new EmployeeOutlet();
+						empOutlet.setEmployee(employee);
+						empOutlet.setOutlet(eo.getOutlet());
+						eoDao.save(empOutlet);
+					}
+				}
+			}
 		}
+	}*/
 		if(emp.getUser()!=null) {
 			User user = new User();
+			user.setId(emp.getUser().getId());
 			user.setEmployee(employee);
 			user.setRole(emp.getUser().getRole());
 			user.setUsername(emp.getUser().getUsername());
@@ -73,7 +92,12 @@ public class EmployeeService {
 	}
 	
 	public List<Employee> selectAll(){
-		return empDao.selectAll();
+		List<Employee> emps = empDao.selectAll(); 
+		for(Employee emp : emps) {
+			List<EmployeeOutlet> empOUtlets = eoDao.getEmployeeOutletByEmployee(emp);
+			emp.setEmpOutlet(empOUtlets);
+		}
+		return emps;
 	}
 	
 	public Employee getOne(long id) {

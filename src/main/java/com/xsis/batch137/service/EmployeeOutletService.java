@@ -22,7 +22,13 @@ public class EmployeeOutletService {
 	@Autowired
 	EmployeeOutletDao eoDao;
 	
-	/*public List<EmployeeOutlet> getEmp() {
-		return eoDao.getEmployeeOutletByEmployee();
-	}*/
+	public List<EmployeeOutlet> getEmp() {
+		Employee emp = new Employee();
+		emp.setId(1);
+		emp.setFirstName("aaaa");
+		emp.setLastName("aaaaa");
+		emp.setActive(true);
+		emp.setHaveAccount(true);
+		return eoDao.getEmployeeOutletByEmployee(emp);
+	}
 }

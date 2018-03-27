@@ -18,7 +18,7 @@ public class UserDaoImpl implements UserDao {
 	public void save(User user) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.save(user);
+		session.saveOrUpdate(user);
 		session.flush();
 	}
 
