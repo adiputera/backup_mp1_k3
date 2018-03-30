@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xsis.batch137.dao.ItemInventoryDao;
+import com.xsis.batch137.model.Item;
 import com.xsis.batch137.model.ItemInventory;
+import com.xsis.batch137.model.ItemVariant;
 
 @Service
 @Transactional
@@ -18,11 +20,11 @@ public class ItemInventoryService {
 	public void save(ItemInventory itemInventory) {
 		itemInventoryDao.save(itemInventory);
 	}
-	public ItemInventory getOne(long id) {
+	public ItemInventory getOne(Long id) {
 		ItemInventory itemInventory=new ItemInventory();
+		itemInventory.setId(id);
 		return itemInventoryDao.getOne(itemInventory);
 	}
-	
 	public List<ItemInventory> selectAll(){
 		return itemInventoryDao.selectAll();
 	}
@@ -38,5 +40,17 @@ public class ItemInventoryService {
 	
 	public void saveAtauUpdate(ItemInventory itemInventory) {
 		itemInventoryDao.saveAtauUpdate(itemInventory);
+	}
+	
+	public List<ItemInventory> searchInventoryByItem(Item item){
+		return itemInventoryDao.searchInventoryByItem(item);
+	}
+
+	public List<ItemInventory> searchItemInventoryByItemName(String search) {
+		return itemInventoryDao.searchItemInventoryByItemName(search);
+	}
+	public List<ItemInventory> searchInventoryByItemName(String search) {
+		// TODO Auto-generated method stub
+		return itemInventoryDao.searchInventoryByItemName(search);
 	}
 }

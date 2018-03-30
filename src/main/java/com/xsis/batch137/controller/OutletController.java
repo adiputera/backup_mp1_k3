@@ -1,18 +1,24 @@
 package com.xsis.batch137.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.xsis.batch137.model.District;
 import com.xsis.batch137.model.Outlet;
+import com.xsis.batch137.model.Province;
+import com.xsis.batch137.model.Region;
 import com.xsis.batch137.service.OutletService;
 
 @Controller
@@ -24,9 +30,25 @@ public class OutletController {
 	
 	@RequestMapping
 	public String view(Model model) {
+		List<Province> provinces = outletService.getAllProvince();
 		List<Outlet> outlets = outletService.selectAll();
+		model.addAttribute("provinces", provinces);
 		model.addAttribute("outlets", outlets);
 		return "/outlet/outlet-view";
+	}
+	
+	@RequestMapping(value="/get-region/{id}", method=RequestMethod.GET)
+	@ResponseBody
+	public List<Region> getRegionByProvince(@PathVariable long id) {
+		List<Region> regions = outletService.getRegionByProvince(id);
+		return regions;
+	}
+	
+	@RequestMapping(value="/get-district/{id}", method=RequestMethod.GET)
+	@ResponseBody
+	public List<District> getDistrictByRegion(@PathVariable long id){
+		List<District> districts = outletService.getDistrictByRegion(id);
+		return districts;
 	}
 	
 	@RequestMapping(value="/save", method=RequestMethod.POST)
@@ -42,9 +64,11 @@ public class OutletController {
 	}
 	
 	@RequestMapping(value="/take", method=RequestMethod.GET)
-	public void getOne(@RequestParam("id") long id, Model model) {
-		Outlet outlet = outletService.getOne(id);
-		model.addAttribute("outlet", outlet);
+	@ResponseBody
+	public Outlet getOne(@RequestParam("id") long id) {
+		/*List<Object> list = new ArrayList<Object>();
+		list = outletService.getOne(id);*/
+		return outletService.getOne(id);
 	}
 	
 	@RequestMapping(value="/update", method=RequestMethod.PUT)

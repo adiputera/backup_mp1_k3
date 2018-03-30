@@ -39,36 +39,25 @@ public class EmployeeService {
 		employee.setActive(emp.isActive());
 		empDao.save(employee);
 		
-		/*if(emp.getEmpOutlet()!=null) {
-		if(empos.isEmpty()) {
-			for(EmployeeOutlet eo : emp.getEmpOutlet()) {
-				EmployeeOutlet empOutlet = new EmployeeOutlet();
-				empOutlet.setEmployee(employee);
-				empOutlet.setOutlet(eo.getOutlet());
-				eoDao.save(empOutlet);
-			}
-			
-		}else {
-			for(EmployeeOutlet eo : emp.getEmpOutlet()) {
-				for(EmployeeOutlet empo : empos) {
-					long id1 = eo.getOutlet().getId();
-					long id2 = empo.getOutlet().getId();
-					if(id1==id2) {
-						
-					}else {
-						EmployeeOutlet empOutlet = new EmployeeOutlet();
-						empOutlet.setEmployee(employee);
-						empOutlet.setOutlet(eo.getOutlet());
-						eoDao.save(empOutlet);
-					}
-				}
+		List<EmployeeOutlet> empos = eoDao.getEmployeeOutletByEmployee(employee);
+		if(empos!=null) {
+			for(EmployeeOutlet eo : empos) {
+				eoDao.delete(eo);
 			}
 		}
-	}*/
+		if(emp.getEmpOutlet()!=null) {
+			for(EmployeeOutlet eo : emp.getEmpOutlet()) {
+				EmployeeOutlet empo = new EmployeeOutlet();
+				empo.setEmployee(employee);
+				empo.setOutlet(eo.getOutlet());
+				eoDao.save(empo);
+			}
+		}
 		if(emp.getUser()!=null) {
 			User user = new User();
 			user.setId(emp.getUser().getId());
 			user.setEmployee(employee);
+			user.setActive(emp.getUser().isActive());
 			user.setRole(emp.getUser().getRole());
 			user.setUsername(emp.getUser().getUsername());
 			user.setPassword(emp.getUser().getPassword());
@@ -93,6 +82,9 @@ public class EmployeeService {
 	
 	public List<Employee> selectAll(){
 		List<Employee> emps = empDao.selectAll(); 
+		if(emps.isEmpty()) {
+			return null;
+		}
 		for(Employee emp : emps) {
 			List<EmployeeOutlet> empOUtlets = eoDao.getEmployeeOutletByEmployee(emp);
 			emp.setEmpOutlet(empOUtlets);
@@ -110,7 +102,11 @@ public class EmployeeService {
 		emp.setActive(false);
 		Employee empss = empDao.getOne(emp);
 		List<EmployeeOutlet> empOUtlets = eoDao.getEmployeeOutletByEmployee(empss);
-		empss.setEmpOutlet(empOUtlets);
+		if(empOUtlets.isEmpty()) {
+			
+		}else {
+			empss.setEmpOutlet(empOUtlets);
+		}
 		return empss;
 	}
 

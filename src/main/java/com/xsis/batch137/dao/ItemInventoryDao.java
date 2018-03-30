@@ -2,6 +2,7 @@ package com.xsis.batch137.dao;
 
 import java.util.List;
 
+import com.xsis.batch137.model.Item;
 import com.xsis.batch137.model.ItemInventory;
 
 public interface ItemInventoryDao {
@@ -11,4 +12,7 @@ public interface ItemInventoryDao {
 	public void delete(ItemInventory itemInventory);
 	public void update(ItemInventory itemInventory);
 	public void saveAtauUpdate(ItemInventory itemInventory);
+	public List<ItemInventory> searchInventoryByItem(Item item);
+	public List<ItemInventory> searchItemInventoryByItemName(String search);
+	public List<ItemInventory> searchInventoryByItemName(String search);
 }

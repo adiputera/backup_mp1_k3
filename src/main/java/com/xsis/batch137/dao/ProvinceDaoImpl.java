@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.xsis.batch137.model.Province;
+import com.xsis.batch137.model.Region;
 
 @Repository
 public class ProvinceDaoImpl implements ProvinceDao{
@@ -18,7 +19,14 @@ public class ProvinceDaoImpl implements ProvinceDao{
 	public List<Province> selectAll() {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		return session.createCriteria(Province.class).list();
+		String hql = "from Province where active = 1";
+		List<Province> provinces = session.createQuery(hql).list();
+		if (provinces == null) {
+			return null;
+		}
+		else {
+			return provinces;
+		}
 	}
 	
 	

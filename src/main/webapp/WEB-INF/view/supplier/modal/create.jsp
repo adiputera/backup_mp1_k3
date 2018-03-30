@@ -10,18 +10,7 @@
 				</div>
 				<div class="modal-body">
 					<form id="formdepartemen" data-parsley-validate method="post">
-					<select name="workshop1" required="required" id="workshop1">
-    				<option disabled selected value=""> -- select an option -- </option>
-   	 				<option value="wkshp1">Workshop</option>
-   					<option value="wkshp2">name</option>
-    				<option value="wkshp3">Workshop name</option>
-					</select>
-					<select name="workshop1" required="required" id="workshop2">
-    				<option disabled selected value=""> -- select an option -- </option>
-    				<option value="wkshp1">Workshop</option>
-    				<option value="wkshp2">name</option>
-    				<option value="wkshp3">Workshop name</option>
-					</select>
+					
 						<table>
 						
 							<tr>
@@ -45,64 +34,64 @@
 							<tr>
 								<td>Email</td>
 								<td>:</td>
-								<td><input type="text" name="supplier-email" id="supplier-email" data-parsley-required="true" /></td>
+								<td><input type="text" name="supplier-email" id="supplier-email" data-parsley-required="true" placeholder="example: alfa@gmail.com" /></td>
 							</tr>
 							
 							<tr>
-    							<td>Province</td>
-    							<td>:</td>
-    							<td>
-    								<select id="prov-id">
-    									<c:forEach var="prov" items="${provinces }">
-    										<option>${prov.name }</option>
-    									</c:forEach>
-    									<option>1</option>
-    									<option>2</option>
-    									<option>3</option>
-    								</select>
-    							</td>
-    						</tr>
-    						
-    						<tr>
-    							<td>Region</td>
-    							<td>:</td>
-    							<td>
-    								<select id="reg-id">
-    									<c:forEach var="prov" items="${regions }">
-    										<option>${prov.name }</option>
-    									</c:forEach>
-    									<option>1</option>
-    									<option>2</option>
-    									<option>3</option>
-    								</select>
-    							</td>
-    						</tr>
-    						
-    						<tr>
-								<td>District</td>
+								<td>Postal Code</td>
 								<td>:</td>
-								<td>
-    								<select id="dist-id">
-    									<c:forEach items="${districts }" var="prov">
-    										<option>${prov.name}</option>
-    									</c:forEach>
-    									<option>1</option>
-    									<option>2</option>
-    									<option>3</option>
-    								</select>
-    							</td>
-    						</tr>
+								<td><input type="text" name="supplier-postal" id="supplier-postal" data-parsley-required="true" placeholder="max six characters" /></td>
+							</tr>
     						    						
 							<tr>
 								<td><input type="hidden" name="id" id="id"></td>
 							</tr>
 						</table>
-					</form>
+						
+						<table>
+						<thead>
+							<tr>
+								<td class="text-center">Province</td>
+								<td class="text-center">Region</td>
+								<td class="text-center">District</td>
+							</tr>
+						</thead>
+						
+						<tbody>
+						<tr>
+						
+						<td>
+						<select name="area" required="required" id="prov-id">
+    					<option disabled selected value=""> --- Select A Province --- </option>
+    					<c:forEach var="prov" items="${provinces }">
+    						<option value="${prov.id }">${prov.name }</option>
+    					</c:forEach>
+						</select>
+						</td>
+						
+						<td>
+						<select name="area" required="required" id="reg-id">
+    						<option disabled selected value=""> --- Select A Region --- </option>
+						</select>
+						</td>
+						
+						<td>
+						<select name="area" required="required" id="dist-id">
+    						<option disabled selected value=""> --- Select A District --- </option>
+						</select>
+						</td>
+						
+						</tr>
+						</tbody>
+						</table>
+						
+						
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+					<button type="reset" class="btn btn-danger" id="tbl-reset">Cancel</button>
 					<button type="button" class="btn btn-info" id="tbl-simpan">Save</button>
 				</div>
+				</form>
 			</div>
 
 		</div>

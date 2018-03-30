@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -20,61 +21,70 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import com.sun.istack.NotNull;
 
+
+
 @Entity
-@Table(name = "pos_item_variant")
+@Table(name="pos_item_variant")
 public class ItemVariant {
-
+	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private long id;
-
-	@Size(max = 255)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE)
+	private Long id;
+	@Size(max=255)
 	@NotNull
-	@NotEmpty
 	private String name;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
+	public List<AdjustmentDetail> adjustmentDetail;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "variant", cascade = CascadeType.ALL)
+	private List<PurchaseRequestDetail> purchaseReqDetail;
 
-	@Size(max = 50)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "variant", cascade = CascadeType.ALL)
+	public List<PurchaseOrderDetail> purchaseOrderDetail;
+	
+	@Size(max=50)
 	@NotNull
-	@NotEmpty
 	private String sku;
-
+	
 	@NotNull
-	@NotEmpty
 	private float price;
-
+	
 	@ManyToOne
 	@JoinColumn(name = "created_by")
 	private User createdBy;
-
-	@Column(name = "created_on")
+	
+	@Column(name="created_on")
 	private Date createdOn;
-
+	
 	@ManyToOne
 	@JoinColumn(name = "modified_by")
 	private User modifiedBy;
-
-	@Column(name = "modified_on")
+	
+	@Column(name="modified_on")
 	private Date modifiedOn;
-
+	
 	@NotNull
-	@Column(nullable=false)
-	private boolean active;
-
-	// relate to item
+	private Boolean active;
+	
+	//relate to item
 	@ManyToOne
 	@NotNull
-	@NotEmpty
 	private Item item;
-
-	// relate to intemInvetory
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "itemVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+	
+	//relate to intemInvetory
+	@OneToMany(fetch=FetchType.LAZY,mappedBy="itemVariant",cascade=CascadeType.ALL,orphanRemoval=true)
 	public List<ItemInventory> itemInventories;
+	
+	//relate to transferdetail
+	@OneToMany(fetch=FetchType.LAZY,mappedBy="itemVariant",cascade=CascadeType.ALL,orphanRemoval=true)
+	public List<TransferStockDetail> transferStockDetail;
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -101,7 +111,7 @@ public class ItemVariant {
 	public void setPrice(float price) {
 		this.price = price;
 	}
-	
+
 	public Date getCreatedOn() {
 		return createdOn;
 	}
@@ -118,11 +128,13 @@ public class ItemVariant {
 		this.modifiedOn = modifiedOn;
 	}
 
-	public boolean isActive() {
+
+
+	public Boolean getActive() {
 		return active;
 	}
 
-	public void setActive(boolean active) {
+	public void setActive(Boolean active) {
 		this.active = active;
 	}
 
@@ -142,6 +154,14 @@ public class ItemVariant {
 		this.itemInventories = itemInventories;
 	}
 
+	public List<AdjustmentDetail> getAdjustmentDetail() {
+		return adjustmentDetail;
+	}
+
+	public void setAdjustmentDetail(List<AdjustmentDetail> adjustmentDetail) {
+		this.adjustmentDetail = adjustmentDetail;
+	}
+
 	public User getCreatedBy() {
 		return createdBy;
 	}
@@ -158,4 +178,30 @@ public class ItemVariant {
 		this.modifiedBy = modifiedBy;
 	}
 
+	public List<TransferStockDetail> getTransferStockDetail() {
+		return transferStockDetail;
+	}
+
+	public void setTransferStockDetail(List<TransferStockDetail> transferStockDetail) {
+		this.transferStockDetail = transferStockDetail;
+	}
+
+	public List<PurchaseRequestDetail> getPurchaseReqDetail() {
+		return purchaseReqDetail;
+	}
+
+	public void setPurchaseReqDetail(List<PurchaseRequestDetail> purchaseReqDetail) {
+		this.purchaseReqDetail = purchaseReqDetail;
+	}
+
+	public List<PurchaseOrderDetail> getPurchaseOrderDetail() {
+		return purchaseOrderDetail;
+	}
+
+	public void setPurchaseOrderDetail(List<PurchaseOrderDetail> purchaseOrderDetail) {
+		this.purchaseOrderDetail = purchaseOrderDetail;
+	}
+	
+	
+	
 }

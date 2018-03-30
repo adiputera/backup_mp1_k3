@@ -1,14 +1,18 @@
 package com.xsis.batch137.model;
 
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -43,15 +47,15 @@ public class Supplier {
 	private String email;
 	
 	@ManyToOne
-	@JoinColumn(name="province_id", nullable=false)
+	@JoinColumn(name="province_id")
 	private Province province;
 	
 	@ManyToOne
-	@JoinColumn(name="region_id", nullable=false)
+	@JoinColumn(name="region_id")
 	private Region region;
 	
 	@ManyToOne
-	@JoinColumn(name="district_id", nullable=false)
+	@JoinColumn(name="district_id")
 	private District district;
 	
 	@Size(max = 6)
@@ -77,6 +81,9 @@ public class Supplier {
 	@NotNull
 	@Column(nullable=false)
 	private boolean active;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PurchaseOrder> purchaseOrders;
 
 	public long getId() {
 		return id;
@@ -190,6 +197,13 @@ public class Supplier {
 		this.district = district;
 	}
 
+	public List<PurchaseOrder> getPurchaseOrders() {
+		return purchaseOrders;
+	}
+
+	public void setPurchaseOrders(List<PurchaseOrder> purchaseOrders) {
+		this.purchaseOrders = purchaseOrders;
+	}
 
 
 }

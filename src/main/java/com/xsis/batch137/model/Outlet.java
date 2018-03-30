@@ -19,7 +19,6 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sun.istack.NotNull;
 
 @Entity
@@ -46,15 +45,15 @@ public class Outlet {
 	private String phone;
 
 	@ManyToOne
-	@JoinColumn(name = "province_id", nullable=true)
+	@JoinColumn(name = "province_id")
 	private Province province;
 
 	@ManyToOne
-	@JoinColumn(name = "region_id", nullable=true)
+	@JoinColumn(name = "region_id")
 	private Region region;
 
 	@ManyToOne
-	@JoinColumn(name = "district_id", nullable=true)
+	@JoinColumn(name = "district_id")
 	private District district;
 
 	@Column(name = "postal_code")
@@ -80,7 +79,7 @@ public class Outlet {
 	private boolean active;
 
 	// relasi ke emp outlet
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "outlet", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "outlet", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<EmployeeOutlet> empOutlet;
 
 	// relate to itemInveroty
@@ -91,7 +90,13 @@ public class Outlet {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "outlet", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Adjustment> adjustments;
 	
+	// relate to purchase request
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "outlet", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PurchaseRequest> purchaseReqs;
 	
+	// relate to purchase order
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "outlet", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PurchaseOrder> purchaseOrders;
 
 	public List<Adjustment> getAdjustments() {
 		return adjustments;
@@ -227,6 +232,22 @@ public class Outlet {
 
 	public void setDistrict(District district) {
 		this.district = district;
+	}
+
+	public List<PurchaseRequest> getPurchaseReqs() {
+		return purchaseReqs;
+	}
+
+	public void setPurchaseReqs(List<PurchaseRequest> purchaseReqs) {
+		this.purchaseReqs = purchaseReqs;
+	}
+
+	public List<PurchaseOrder> getPurchaseOrders() {
+		return purchaseOrders;
+	}
+
+	public void setPurchaseOrders(List<PurchaseOrder> purchaseOrders) {
+		this.purchaseOrders = purchaseOrders;
 	}
 
 

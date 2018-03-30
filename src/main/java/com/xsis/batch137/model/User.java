@@ -21,11 +21,17 @@ package com.xsis.batch137.model;
 	import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 	@Entity
 	@Table(name="user_137")
 	public class User {
 
+	public User() {
+		this.createdOn = new Date();
+		this.modifiedOn = new Date();
+	}
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
@@ -56,7 +62,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "createdBy", cascade = CascadeType.ALL)
 	private List<User> createdUser;
 	
-	@Temporal(TemporalType.DATE)
 	@Column(name="created_on", nullable=true)
 	private Date createdOn;
 	
@@ -68,7 +73,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "modifiedBy", cascade = CascadeType.ALL)
 	private List<User> modifiedUser;
 	
-	@Temporal(TemporalType.DATE)
 	@Column(name="modified_on", nullable=true)
 	private Date modifiedOn;
 	
@@ -154,12 +158,15 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "modifiedBy", cascade = CascadeType.ALL)
 	private List<Supplier> modifiedSupplier;
 	
+	// list customer
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "createdBy", cascade = CascadeType.ALL)
 	private List<Customer> createdCustomer;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "modifiedBy", cascade = CascadeType.ALL)
 	private List<Customer> modifiedCustomer;
 	
+	
+	// list adjustment
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "createdBy", cascade = CascadeType.ALL)
 	private List<Adjustment> createdAdjustment;
 		
@@ -176,6 +183,38 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 	private List<AdjustmentDetail> modifiedAdjustmentDetail;
 	
 	
+	//list Purchase REquest
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "createdBy", cascade = CascadeType.ALL)
+	private List<PurchaseRequest> createPurchaseRequest;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "modifiedBy", cascade = CascadeType.ALL)
+	private List<PurchaseRequest> modifiedPurchaseRequest;
+	
+	// list purchase request detail
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "createdBy", cascade = CascadeType.ALL)
+	private List<PurchaseRequestDetail> createPurchaseRequestDetail;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "modifiedBy", cascade = CascadeType.ALL)
+	private List<PurchaseRequestDetail> modifiedPurchaseRequestDetail;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "createdBy", cascade = CascadeType.ALL)
+	private List<PurchaseRequestHistory> createPurchaseRequestHistory;
+	
+	//list purchase order
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "createdBy", cascade = CascadeType.ALL)
+	private List<PurchaseOrder> createPurchaseOrder;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "modifiedBy", cascade = CascadeType.ALL)
+	private List<PurchaseOrder> modifiedPurchaseOrder;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "createdBy", cascade = CascadeType.ALL)
+	private List<PurchaseOrderDetail> createPurchaseOrderDetail;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "modifiedBy", cascade = CascadeType.ALL)
+	private List<PurchaseOrderDetail> modifiedPurchaseOrderDetail;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "createdBy", cascade = CascadeType.ALL)
+	private List<PurchaseOrderHistory> createPurchaseOrderHistory;
 	
 	public List<Adjustment> getCreatedAdjustment() {
 		return createdAdjustment;
@@ -479,6 +518,102 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 	public void setModifiedCustomer(List<Customer> modifiedCustomer) {
 		this.modifiedCustomer = modifiedCustomer;
+	}
+
+	public List<AdjustmentHistory> getCreatedAdjustmentHistory() {
+		return createdAdjustmentHistory;
+	}
+
+	public void setCreatedAdjustmentHistory(List<AdjustmentHistory> createdAdjustmentHistory) {
+		this.createdAdjustmentHistory = createdAdjustmentHistory;
+	}
+
+	public List<AdjustmentDetail> getCreatedAdjustmentDetail() {
+		return createdAdjustmentDetail;
+	}
+
+	public void setCreatedAdjustmentDetail(List<AdjustmentDetail> createdAdjustmentDetail) {
+		this.createdAdjustmentDetail = createdAdjustmentDetail;
+	}
+
+	public List<AdjustmentDetail> getModifiedAdjustmentDetail() {
+		return modifiedAdjustmentDetail;
+	}
+
+	public void setModifiedAdjustmentDetail(List<AdjustmentDetail> modifiedAdjustmentDetail) {
+		this.modifiedAdjustmentDetail = modifiedAdjustmentDetail;
+	}
+
+	public List<PurchaseRequest> getCreatePurchaseRequest() {
+		return createPurchaseRequest;
+	}
+
+	public void setCreatePurchaseRequest(List<PurchaseRequest> createPurchaseRequest) {
+		this.createPurchaseRequest = createPurchaseRequest;
+	}
+
+	public List<PurchaseRequest> getModifiedPurchaseRequest() {
+		return modifiedPurchaseRequest;
+	}
+
+	public void setModifiedPurchaseRequest(List<PurchaseRequest> modifiedPurchaseRequest) {
+		this.modifiedPurchaseRequest = modifiedPurchaseRequest;
+	}
+
+	public List<PurchaseRequestDetail> getCreatePurchaseRequestDetail() {
+		return createPurchaseRequestDetail;
+	}
+
+	public void setCreatePurchaseRequestDetail(List<PurchaseRequestDetail> createPurchaseRequestDetail) {
+		this.createPurchaseRequestDetail = createPurchaseRequestDetail;
+	}
+
+	public List<PurchaseRequestDetail> getModifiedPurchaseRequestDetail() {
+		return modifiedPurchaseRequestDetail;
+	}
+
+	public void setModifiedPurchaseRequestDetail(List<PurchaseRequestDetail> modifiedPurchaseRequestDetail) {
+		this.modifiedPurchaseRequestDetail = modifiedPurchaseRequestDetail;
+	}
+
+	public List<PurchaseOrder> getCreatePurchaseOrder() {
+		return createPurchaseOrder;
+	}
+
+	public void setCreatePurchaseOrder(List<PurchaseOrder> createPurchaseOrder) {
+		this.createPurchaseOrder = createPurchaseOrder;
+	}
+
+	public List<PurchaseOrder> getModifiedPurchaseOrder() {
+		return modifiedPurchaseOrder;
+	}
+
+	public void setModifiedPurchaseOrder(List<PurchaseOrder> modifiedPurchaseOrder) {
+		this.modifiedPurchaseOrder = modifiedPurchaseOrder;
+	}
+
+	public List<PurchaseOrderDetail> getCreatePurchaseOrderDetail() {
+		return createPurchaseOrderDetail;
+	}
+
+	public void setCreatePurchaseOrderDetail(List<PurchaseOrderDetail> createPurchaseOrderDetail) {
+		this.createPurchaseOrderDetail = createPurchaseOrderDetail;
+	}
+
+	public List<PurchaseOrderDetail> getModifiedPurchaseOrderDetail() {
+		return modifiedPurchaseOrderDetail;
+	}
+
+	public void setModifiedPurchaseOrderDetail(List<PurchaseOrderDetail> modifiedPurchaseOrderDetail) {
+		this.modifiedPurchaseOrderDetail = modifiedPurchaseOrderDetail;
+	}
+
+	public List<PurchaseOrderHistory> getCreatePurchaseOrderHistory() {
+		return createPurchaseOrderHistory;
+	}
+
+	public void setCreatePurchaseOrderHistory(List<PurchaseOrderHistory> createPurchaseOrderHistory) {
+		this.createPurchaseOrderHistory = createPurchaseOrderHistory;
 	}
 	
 	//sesuatu

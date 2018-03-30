@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>AdminLTE 2 | Data Tables</title>
+<title>Kelompok 3</title>
 <!-- Tell the browser to be responsive to screen width -->
 <meta
 	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
@@ -21,6 +21,14 @@
 <!-- Ionicons -->
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/bower_components/Ionicons/css/ionicons.min.css">
+  <!-- daterange picker -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/bower_components/bootstrap-daterangepicker/daterangepicker.css">
+  <!-- bootstrap datepicker -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/plugins/iCheck/all.css">
+    <!-- Bootstrap time Picker -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/plugins/timepicker/bootstrap-timepicker.min.css">
 <!-- DataTables -->
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
@@ -62,9 +70,24 @@
 	src="${pageContext.request.contextPath}/resources/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
 <script
 	src="${pageContext.request.contextPath}/resources/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<!-- InputMask -->
+<script src="${pageContext.request.contextPath}/resources/plugins/input-mask/jquery.inputmask.js"></script>
+<script src="${pageContext.request.contextPath}/resources/plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+<script src="${pageContext.request.contextPath}/resources/plugins/input-mask/jquery.inputmask.extensions.js"></script>
+<!-- date-range-picker -->
+<script src="${pageContext.request.contextPath}/resources/bower_components/moment/min/moment.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+<!-- bootstrap datepicker -->
+<script src="${pageContext.request.contextPath}/resources/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+<!-- bootstrap color picker -->
+<script src="${pageContext.request.contextPath}/resources/bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js"></script>
+<!-- bootstrap time picker -->
+<script src="${pageContext.request.contextPath}/resources/plugins/timepicker/bootstrap-timepicker.min.js"></script>
 <!-- SlimScroll -->
 <script
 	src="${pageContext.request.contextPath}/resources/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<!-- iCheck 1.0.1 -->
+<script src="${pageContext.request.contextPath}/resources/plugins/iCheck/icheck.min.js"></script>
 <!-- FastClick -->
 <script
 	src="${pageContext.request.contextPath}/resources/bower_components/fastclick/lib/fastclick.js"></script>
@@ -340,12 +363,37 @@
 		<!-- sidebar menu: : style can be found in sidebar.less -->
 		<ul class="sidebar-menu" data-widget="tree">
 			<li class="header">Menu</li>
-			<li class="treeview"><a href="${pageContext.request.contextPath}/employee"><i class="fa fa-files-o"></i><span>Data
-					Employee</span></a></li>
-			<li class="treeview"><a href="${pageContext.request.contextPath}/category"><i class="fa fa-files-o"></i><span>Data
-					Category</span></a></li>
-			<li class="treeview"><a href="${pageContext.request.contextPath}/item"><i class="fa fa-files-o"></i><span>Data
-					Item</span></a></li>
+			<li class="treeview">
+	          <a href="#">
+	            <i class="fa fa-edit"></i> <span>Data Master</span>
+	            <span class="pull-right-container">
+	              <i class="fa fa-angle-left pull-right"></i>
+	            </span>
+	          </a>
+	          <ul class="treeview-menu">
+	            <li><a href="${pageContext.request.contextPath}/employee"><i class="fa fa-users"></i> Employee</a></li>
+	            <li><a href="${pageContext.request.contextPath}/category"><i class="fa fa-object-group"></i> Category</a></li>
+	            <li><a href="${pageContext.request.contextPath}/outlet"><i class="fa fa-shopping-bag"></i> Outlet</a></li>
+	            <li><a href="${pageContext.request.contextPath}/supplier"><i class="fa fa-building"></i> Suppplier</a></li>
+	            <li><a href="${pageContext.request.contextPath}/item"><i class="fa fa-shopping-cart"></i> Item</a></li>
+	          </ul>
+	        </li>
+	        
+	        <li class="treeview">
+	          <a href="#">
+	            <i class="fa fa-edit"></i> <span>Data Transaksi</span>
+	            <span class="pull-right-container">
+	              <i class="fa fa-angle-left pull-right"></i>
+	            </span>
+	          </a>
+	          <ul class="treeview-menu">
+	            <li><a href="${pageContext.request.contextPath}/transaksi/purchase-request"><i class="fa fa-circle-o"></i> Purchase Request</a></li>
+	            <li><a href="${pageContext.request.contextPath}/transaksi/purchase-order"><i class="fa fa-circle-o"></i> Purchase Order</a></li>
+	            <li><a href="${pageContext.request.contextPath}/transaksi/"><i class="fa fa-circle-o"></i> Outlet</a></li>
+	            <li><a href="${pageContext.request.contextPath}/supplier"><i class="fa fa-circle-o"></i> Suppplier</a></li>
+	            <li><a href="${pageContext.request.contextPath}/item"><i class="fa fa-circle-o"></i> Item</a></li>
+	          </ul>
+	        </li>
 		</ul>
 		</section> <!-- /.sidebar --> </aside>
 

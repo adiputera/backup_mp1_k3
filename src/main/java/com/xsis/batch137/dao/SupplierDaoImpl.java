@@ -22,10 +22,11 @@ public class SupplierDaoImpl implements SupplierDao{
 		session.flush();
 	}
 
-	public void delete(Supplier sup) {
+	public void delete(long id) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		session.delete(sup);
+		String hql = "update Supplier set active = 0 where id = :id";
+		session.createQuery(hql).setParameter("id", id).executeUpdate();
 		session.flush();
 	}
 
@@ -39,7 +40,14 @@ public class SupplierDaoImpl implements SupplierDao{
 	public List<Supplier> selectAll() {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		return session.createCriteria(Supplier.class).list();
+		String hql = "from Supplier where active = 1";
+		List<Supplier> suppliers = session.createQuery(hql).list();
+		if(suppliers == null) {
+			return null;
+		}
+		else {
+			return suppliers;
+		}
 	}
 
 	public Supplier getOne(long id) {

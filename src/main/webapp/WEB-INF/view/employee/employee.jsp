@@ -1,50 +1,66 @@
 <%@ include file="/WEB-INF/view/masterPage/layout.jsp"%>
 <section class="content">
 	<form id="form-emp">
-		<table>
-			<tr>
-				<td>
-				<input type="hidden" id="in-id">
-				<input type="text" class="form-control" id="in-firstname" placeholder="First Name" data-parsley-required="true"></td>
-				<td><input type="text" class="form-control" id="in-lastname" placeholder="Last Name" data-parsley-required="true"></td>
-				<td><input type="email" class="form-control" id="in-email" placeholder="Email" data-parsley-required="true" data-parsley-type="email"></td>
-				<td>
+			<div class="row">
+				<div class="col-xs-3">
+					<input type="hidden" id="in-id">
+					<input type="text" class="form-control" id="in-firstname" placeholder="First Name" data-parsley-required="true"></div>
+				<div class="col-xs-3">
+					<input type="text" class="form-control" id="in-lastname" placeholder="Last Name" data-parsley-required="true">
+				</div>
+				<div class="col-xs-3">
+					<input type="email" class="form-control" id="in-email" placeholder="Email" data-parsley-required="true" data-parsley-type="email">
+				</div>
+				<div class="col-xs-3">
 					<select id="in-title" class="form-control" style="font-size: 16px; font-family: raleway;">
 						<option value="Mr.">Mr.</option>
 						<option value="Mrs.">Mrs.</option>
 					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="button" class="btn btn-info" id="btn-outlet" value="Assign Outlet">
-				</td>
-				<td>
-					<input type="checkbox" id="cek-akun"> Create Account
-				</td>
-			</tr>
-			<tr id = "buat-akun" style="display:none;">
-				<td>
-					<select id = "pilih-role">
+				</div>
+			</div>
+			<br/>
+			<div class="row">
+				<div class="col-xs-3">
+					<input type="button" class="btn btn-info btn-block" id="btn-outlet" value="Assign Outlet">
+				</div>
+				<div class="col-xs-3">
+					<div class="form-check checkbox-teal">
+						<input type="checkbox" id="cek-akun" class="form-check-input">
+						<label class="form-check-label" for="cek-akun">Create Account</label>
+					</div>
+				</div>
+			</div>
+			<hr style="border-color:black; border-top:1px dashed;">
+			<div class="row" id = "buat-akun" style="display:none;">
+				<div class="col-xs-3">
+					<select id = "pilih-role" class="form-control">
 						<c:forEach items = "${roles }" var= "role">
 							<option value="${role.id }">${role.name }</option>
 						</c:forEach>
 					</select>
-				<td>
-				<td>
+				</div>
+				<div class="col-xs-3">
 					<input type="hidden" id="in-id-user">
-					<input type="text" placeholder="username" id="in-username" class="form-control">
-				</td>
-				<td>
-					<input type="password" placeholder="password" id="in-password" class="form-control">
-				</td>
-			</tr>
-		</table>
-		<input type="button" class="btn btn-info" value="Save" id="btn-simpan">
-		<input type="reset" class="btn btn-warning" value="Cancel" id="btn-batal">
+					<input type="text" placeholder="username" id="in-username" class="form-control" data-parsley-required="false">
+				</div>
+				<div class="col-xs-3">
+					<input type="password" placeholder="password" id="in-password" class="form-control" data-parsley-required="false">
+				</div>
+			</div>
+			<br>
+		<div class="row">
+			<div class="col-xs-8">
+			</div>
+			<div class="col-xs-2">
+				<input type="button" class="btn btn-info btn-block" value="Save" id="btn-simpan">
+			</div>
+			<div class="col-xs-2">
+				<input type="reset" class="btn btn-warning btn-block" value="Cancel" id="btn-batal">
+			</div>
+		</div>
 	</form>
 	<h2>Staff List</h2>
-	<hr />
+	<hr style="border-color:black; border-top:1px dashed;">
 	<table id="data-emp"
 		class="table table-striped table-bordered table-hover">
 		<thead>
@@ -109,9 +125,12 @@
 					<h4 id="judul-modal">Assign Outlet to Employee</h4>
 				</div>
 				<div class="modal-body">
-					<c:forEach items="${outlets }" var="outlet">
-						<input type="checkbox" class="in-outlet" name="in-outlet" value="${outlet.id }"> ${outlet.name } <br/>
-					</c:forEach>
+					<div class="form-check checkbox-teal">
+						<c:forEach items="${outlets }" var="outlet">
+							<input type="checkbox" class="in-outlet" class="form-check-input" name="in-outlet" value="${outlet.id }">
+							<label class="form-check-label" for="cek-akun">${outlet.name }</label><br/>
+						</c:forEach>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
@@ -154,8 +173,12 @@
 		$('#cek-akun').change(function () {
 	        if (this.checked) 
 	            $('#buat-akun').fadeIn('fast');
+	        	$('#in-username').attr('data-parsley-required', true);
+	        	$('#in-password').attr('data-parsley-required', true);
 	        else 
 	            $('#buat-akun').fadeOut('fast');
+	        	$('#in-username').attr('data-parsley-required', false);
+        		$('#in-password').attr('data-parsley-required', false);
 	    });
 	    $('#cek-akun').change();
 	    
@@ -213,6 +236,7 @@
 					}else if(data.haveAccount == 0 && data.user.active == 1){
 						$('#cek-akun').prop('checked', false);
 						$('#buat-akun').fadeOut('fast');
+						$('#in-id-user').val(data.user.id);
 						$('#in-username').val(data.user.username);
 						$('#in-password').val(data.user.password);
 						$('#pilih-role').val(data.user.role.id);
