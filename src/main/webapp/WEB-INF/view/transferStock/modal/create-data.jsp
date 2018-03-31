@@ -1,4 +1,4 @@
-<!-- Modal -->
+<!--a Modal -->
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <div class="modal fade" id="modal-create-data" tabindex="-1" role="dialog"
@@ -76,7 +76,7 @@
 
 					<div class="modal-footer">
 						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-						<button type="submit" id="btn-create-data" class="btn btn-primary">Save & Submit</button>
+						<button type="submit" id="btn-save-submit" class="btn btn-primary">Save & Submit</button>
 					</div>
 				</form>
 			</div>

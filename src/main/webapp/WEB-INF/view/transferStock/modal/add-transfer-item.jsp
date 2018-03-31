@@ -1,4 +1,4 @@
-<!-- Modal -->
+<!-- aModal -->
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <div class="modal fade" id="modal-add-transfer-item" tabindex="-1" role="dialog"
@@ -42,7 +42,7 @@
 
 					<div class="modal-footer">
 						<button type="button" id="cancel-add-transfer-item" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-						<button type="submit" id="btn-save-transfer-item" data-dismiss="modal" class="btn btn-primary">Add</button>
+						<button type="submit" id="btn-save-transfer-item" class="btn btn-primary">Add</button>
 					</div>
 				</form>
 			</div>

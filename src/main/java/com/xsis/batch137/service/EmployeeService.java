@@ -84,23 +84,17 @@ public class EmployeeService {
 		List<Employee> emps = empDao.selectAll(); 
 		if(emps.isEmpty()) {
 			return null;
+		}else {
+			for(Employee emp : emps) {
+				List<EmployeeOutlet> empOUtlets = eoDao.getEmployeeOutletByEmployee(emp);
+				emp.setEmpOutlet(empOUtlets);
+			}
+			return emps;
 		}
-		for(Employee emp : emps) {
-			List<EmployeeOutlet> empOUtlets = eoDao.getEmployeeOutletByEmployee(emp);
-			emp.setEmpOutlet(empOUtlets);
-		}
-		return emps;
 	}
 	
 	public Employee getOne(long id) {
-		Employee emp = new Employee();
-		System.out.println("execute");
-		emp.setId(id);
-		emp.setFirstName("aaaaa");
-		emp.setLastName("aaaaa");
-		emp.setHaveAccount(true);
-		emp.setActive(false);
-		Employee empss = empDao.getOne(emp);
+		Employee empss = empDao.getOne(id);
 		List<EmployeeOutlet> empOUtlets = eoDao.getEmployeeOutletByEmployee(empss);
 		if(empOUtlets.isEmpty()) {
 			

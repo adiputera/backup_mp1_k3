@@ -1,6 +1,5 @@
 <%@ include file="/WEB-INF/view/masterPage/layout.jsp"%>
-<div class="container">
-
+<section class="content">
 	<h3>Purchase Request</h3>
 	<hr style="border-color:black;">
 	<div class="row">
@@ -61,16 +60,13 @@
 					<td>${pr.notes }</td>
 					<td>${pr.status }</td>
 					<td>
-						<input type="button" class="btn-edit btn btn-default" value="Edit"> | 
-						<input type="button" class="btn-view btn btn-info" value="View">
+						<input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="${pr.id }"> | 
+						<a href='${pageContext.request.contextPath}/transaksi/purchase-request/detail/${pr.id}' class="btn-view-pr btn btn-info" key-id="${pr.id }">View</a>
 					</td>
 				</tr>
 			</c:forEach>
 		</tbody>
 	</table>
-	
-	
-</div>
 
 	<div id="create-pr" class="modal fade" role="dialog">
 		<div class="modal-dialog modal-confirm">
@@ -93,6 +89,7 @@
 	                  	<i class="fa fa-calendar"></i>
 	                	</div>
 	                	<input type="text" class="form-control pull-right" id="pilih-tanggal">
+	                	<input type="hidden" id="in-id">
 	                </div>
 	                <div class="form-group">
 	                	<h4>Notes : </h4>
@@ -160,7 +157,7 @@
 			</div>
 		</div>
 	</div>
-	
+</section>
 </body>
 <script>
 	$(function(){
@@ -212,7 +209,7 @@
 					"id" : $('#pil-outlet').val()
 				},
 				"detail" : prd,
-				"status" : "created",
+				"status" : "Created",
 				"readyTime" : tanggal
 			};
 			console.log(purReq);
@@ -226,7 +223,7 @@
 					contentType : 'application/json',
 					success : function() {
 						console.log('simpan');
-						//window.location = '${pageContext.request.contextPath}/transaksi/purchase-request';
+						window.location = '${pageContext.request.contextPath}/transaksi/purchase-request';
 					},
 					error : function() {
 						alert('save failed');
@@ -236,38 +233,54 @@
 		}); // end fungsi simpan
 	    
 		var added = [];
-		var addedQty = [];
+		
+		// auto complete
+		var itemsss = [];
+		var itemss = {
+				data : itemsss,
+		};
+		
+		$('#search-item').easyAutocomplete(itemss);
+		
+		$('#btn-tambah-item').on('click', function(){
+			$.ajax({
+				type : 'get',
+				url : '${pageContext.request.contextPath}/item/get-inventory',
+				dataType : 'json',
+				success : function(data){
+					$.each(data, function(key, val) {
+						var namaItem = val.itemVariant.item.name +'-'+ val.itemVariant.name;
+						itemsss.push(namaItem);
+					});
+				}, error : function(){
+					
+				}
+			});
+		});
+		
+		$(".easy-autocomplete").removeAttr("style");
 		
 		// fungsi search
 	    $('#search-item').on('input',function(e){
+	    	console.log(itemsss);
 			var word = $(this).val();
 			if (word=="") {
 				$('#list-barang').empty();
 			} else {
 				$.ajax({
 					type : 'GET',
-					url : '${pageContext.request.contextPath}/transaksi/purchase-request/search?search='+word,
+					url : '${pageContext.request.contextPath}/transaksi/purchase-request/search-item?search='+word,
 					dataType: 'json',
 					success : function(data){
 						console.log(data);
 						$('#list-barang').empty();
 						$.each(data, function(key, val) {
-							//if(added.indexOf(val.id.toString()) == -1) {
-								$('#list-barang').append(
-										'<tr id = "tr'+val.id+'"><td>'+ val.itemVariant.item.name +'-'+ val.itemVariant.name +'</td>'
-										+'<td id="inStock'+ val.id +'">'+ val.beginning +'</td>'
-										+'<td id="td-qty'+ val.id +'"><input type="number" id="reqQty'+ val.id +'" value="1" /></td>'
-										+'<td><button type="button" id="'+ val.id +'" class="tbl-add-brg btn btn-primary btn-add'+val.id+'" key-id="'+val.itemVariant.id+'">Add</button></td></tr>');
-								$('.btn-add'+val.id).prop('disabled', false);
-							/*} else {
-								var a = added.indexOf(val.id.toString());
-								$('#list-barang').append('<tr id="tr'+val.id+'"><td>'+ val.itemVariant.item.name +'-'+ val.itemVariant.name +'</td>'
-										+'<td>'+ val.beginning +'</td>'
-										+'<td id="td-qty'+ val.id +'">'+addedQty[a]+'</td>'
-										+'<td><button type="button" id="'+ val.id +'" class=" tbl-add-brg btn btn-primary btn-add'
-										+val.id+'" key-id="'+val.itemVariant.id+'">Add</button></td></tr>');
-								$('.btn-add'+val.id).prop('disabled', true);
-							} */
+							$('#list-barang').append(
+								'<tr id = "tr'+val.id+'"><td>'+ val.itemVariant.item.name +'-'+ val.itemVariant.name +'</td>'
+								+'<td id="inStock'+ val.id +'">'+ val.beginning +'</td>'
+								+'<td id="td-qty'+ val.id +'"><input type="number" id="reqQty'+ val.id +'" value="1" /></td>'
+								+'<td><button type="button" id="'+ val.id +'" class="tbl-add-brg btn btn-primary btn-add'+val.id
+								+'" key-id="'+val.itemVariant.id+'">Add</button></td></tr>');
 						});
 					}, 
 					error : function(){
@@ -292,7 +305,6 @@
 					+'<td><button type="button" class="btn btn-danger btn-hapus-barang" id="btn-del'+id+'" key-id="'+id+'">&times;</button>'
 				);
 				added.push(id);
-				addedQty.push(reqQty);
 			}else{
 				var target = $('#list-item > #'+id+'');
 				var oldReq = target.find('td').eq(2).text();
@@ -301,6 +313,51 @@
 			}
 		});
 		
+		$('#data-purchase-item').on('click', '.btn-hapus-barang', function(){
+			var id = $(this).attr('key-id');
+			$(this).parent().parent().remove();
+			var index = added.indexOf(id.toString());
+			if(index > -1){
+				added.splice(index, 1);
+			}
+		});
+		
+		$('#data-pr').on('click', '.btn-edit-pr', function(){
+			console.log('edit');
+			$('#list-item').empty();
+			var id = $(this).attr('key-id');
+			$.ajax({
+				type : 'GET',
+				url : '${pageContext.request.contextPath}/transaksi/purchase-request/get-one/'+id,
+				dataType: 'json',
+				success : function(data){
+					console.log(data);
+					$('#in-notes').val(data.notes);
+					$('#in-id').val(data.id);
+					var tgl = data.readyTime.split('-');
+					var tanggal = tgl[1]+'/'+tgl[2]+'/'+tgl[0];
+					$('#pilih-tanggal').val(tanggal);
+					$(data.detail).each(function(key, val){
+						$('#list-item').append(
+							'<tr key-id="'+val.variant.id+'"><td>'+val.variant.item.name+'-'+val.variant.name+'</td>'
+							+'<td>null</td>'
+							+'<td>'+val.requestQty+'</td>'
+							+'<td><button type="button" class="btn btn-danger btn-hapus-barang" id="btn-del'+id+'" key-id="'+id+'">&times;</button>'
+						);
+					})
+					$('#create-pr').modal('show');
+				}, 
+				error : function(){
+					console.log('gagal');
+				}
+			});
+		});
+		
+		function clearForm(){
+			$('#in-id').val('');
+			$('#list-item').empty();
+			$('#in-notes').val('');
+		}
 	});
 </script>
 </html>

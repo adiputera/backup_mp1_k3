@@ -7,46 +7,46 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.xsis.batch137.model.Adjustment;
+import com.xsis.batch137.model.SalesOrderDetail;
+
+
 
 @Repository
-public class AdjustmentDaoImpl implements AdjustmentDao{
-
+public class SalesOrderDetailDaoImpl implements SalesOrderDetailDao{
 	@Autowired
 	SessionFactory sessionFactory;
-
-	public void save(Adjustment adjustment) {
-		// TODO Auto-generated method stub
-		Session session = sessionFactory.getCurrentSession();
-		session.save(adjustment);
-		session.flush();
-	}
-
-	public void update(Adjustment adjustment) {
-		// TODO Auto-generated method stub
-		Session session = sessionFactory.getCurrentSession();
-		session.update(adjustment);
-		session.flush();
-	}
-
-	public void delete(Adjustment adjustment) {
-		// TODO Auto-generated method stub
-		Session session = sessionFactory.getCurrentSession();
-		session.delete(adjustment);
-		session.flush();
-	}
-
-	public List<Adjustment> selectAll() {
-		// TODO Auto-generated method stub
-		Session session = sessionFactory.getCurrentSession();
-		return session.createCriteria(Adjustment.class).list();
-	}
-
-	public Adjustment getOne(long id) {
-		// TODO Auto-generated method stub
-		Session session = sessionFactory.getCurrentSession();
-		return session.get(Adjustment.class, id);
-	}
 	
-	
+	public void save(SalesOrderDetail salesOrderDetail) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		session.save(salesOrderDetail);
+		session.flush();
+	}
+
+	public void delete(SalesOrderDetail salesOrderDetail) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		session.delete(salesOrderDetail);
+		session.flush();
+	}
+
+	public void update(SalesOrderDetail salesOrderDetail) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		session.update(salesOrderDetail);
+		session.flush();
+	}
+
+	public SalesOrderDetail getOne(String id) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		return session.get(SalesOrderDetail.class, id);
+	}
+
+	public List<SalesOrderDetail> selectAll() {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		return session.createCriteria(SalesOrderDetail.class).list();
+	}
+
 }

@@ -14,9 +14,15 @@ public interface PurchaseRequestDao {
 	
 	List<PurchaseRequest> selectAll();
 	
-	PurchaseRequest getOne(PurchaseRequest pr);
+	PurchaseRequest getOne(long id);
 	
 	void ubahStatus(String status, long id);
 	
 	int CountPRByMonth(int month, int year);
+	
+	void approve(long id);
+	
+	void reject(long id);
+	
+	void createPo(long id);
 }

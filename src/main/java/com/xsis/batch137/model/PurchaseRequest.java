@@ -26,8 +26,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 public class PurchaseRequest {
 
 	public PurchaseRequest() {
-		this.createdOn = new Date();
-		this.modifiedOn = new Date();
+
 	}
 	
 	@Id
@@ -69,7 +68,8 @@ public class PurchaseRequest {
 	@Column(name="modified_on")
 	private Date modifiedOn;
 	
-	@OneToMany(mappedBy="purchaseReq", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy="purchaseReq", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<PurchaseRequestDetail> detail;
 	
 	@OneToOne(fetch = FetchType.LAZY, mappedBy="purchaseReq", cascade = CascadeType.ALL)
