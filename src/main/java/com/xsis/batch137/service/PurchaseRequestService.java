@@ -8,9 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.xsis.batch137.dao.PurchaseOrderDao;
+import com.xsis.batch137.dao.PurchaseOrderDetailDao;
+import com.xsis.batch137.dao.PurchaseOrderHistoryDao;
 import com.xsis.batch137.dao.PurchaseRequestDao;
 import com.xsis.batch137.dao.PurchaseRequestDetailDao;
 import com.xsis.batch137.dao.PurchaseRequestHistoryDao;
+import com.xsis.batch137.model.PurchaseOrder;
+import com.xsis.batch137.model.PurchaseOrderDetail;
+import com.xsis.batch137.model.PurchaseOrderHistory;
 import com.xsis.batch137.model.PurchaseRequest;
 import com.xsis.batch137.model.PurchaseRequestDetail;
 import com.xsis.batch137.model.PurchaseRequestHistory;
@@ -27,6 +33,15 @@ public class PurchaseRequestService {
 	
 	@Autowired
 	PurchaseRequestHistoryDao prhDao;
+	
+	@Autowired
+	PurchaseOrderDao poDao;
+	
+	@Autowired
+	PurchaseOrderDetailDao podDao;
+	
+	@Autowired
+	PurchaseOrderHistoryDao pohDao;
 	
 	public void save(PurchaseRequest pr) {
 		PurchaseRequest pureq = new PurchaseRequest();
@@ -144,7 +159,7 @@ public class PurchaseRequestService {
 		prDao.approve(id);
 		PurchaseRequest pr = prDao.getOne(id);
 		PurchaseRequestHistory prh = new PurchaseRequestHistory();
-		prh.setCreatedOn(pr.getCreatedOn());
+		prh.setCreatedOn(new Date());
 		prh.setPurchaseReq(pr);
 		prh.setStatus(pr.getStatus());
 		prhDao.save(prh);
@@ -154,7 +169,7 @@ public class PurchaseRequestService {
 		prDao.reject(id);
 		PurchaseRequest pr = prDao.getOne(id);
 		PurchaseRequestHistory prh = new PurchaseRequestHistory();
-		prh.setCreatedOn(pr.getCreatedOn());
+		prh.setCreatedOn(new Date());
 		prh.setPurchaseReq(pr);
 		prh.setStatus(pr.getStatus());
 		prhDao.save(prh);
@@ -163,10 +178,79 @@ public class PurchaseRequestService {
 	public void createPo(long id) {
 		prDao.createPo(id);
 		PurchaseRequest pr = prDao.getOne(id);
+		
+		List<PurchaseRequestDetail> prds = prdDao.selectDetailByPr(pr);
+		
+		if(prds.isEmpty()) {
+			
+		}else {
+			pr.setDetail(prds);
+		}
+		
 		PurchaseRequestHistory prh = new PurchaseRequestHistory();
-		prh.setCreatedOn(pr.getCreatedOn());
+		prh.setCreatedOn(new Date());
 		prh.setPurchaseReq(pr);
 		prh.setStatus(pr.getStatus());
 		prhDao.save(prh);
+		
+		Calendar cal = Calendar.getInstance();
+		int thn = cal.get(Calendar.YEAR);
+		int bln = cal.get(Calendar.MONTH)+1;
+		String bulan;
+		if(bln < 10) {
+			bulan = "0"+bln;
+		} else {
+			bulan = Integer.toString(bln);
+		}
+		int no = poDao.CountPOByMonth(bln, thn)+1;
+		String nomor;
+		
+		if(no < 10) {
+			nomor = "00"+no;
+		} else if(no < 100) {
+			nomor = "0"+no;
+		} else {
+			nomor = Integer.toString(no);
+		}
+		
+		String poNo = "PO"+thn+bulan+nomor;
+		
+		PurchaseOrder po = new PurchaseOrder();
+		po.setCreatedOn(new Date());
+		po.setNotes(pr.getNotes());
+		po.setPoNo(poNo);
+		po.setPurchaseReq(pr);
+		po.setStatus("Created");
+		poDao.save(po);
+		if(pr.getDetail() == null) {
+			
+		}else {
+			for(PurchaseRequestDetail prd : pr.getDetail()) {
+				PurchaseOrderDetail pod = new PurchaseOrderDetail();
+				pod.setCreatedOn(po.getCreatedOn());
+				pod.setPurchaseOrder(po);
+				pod.setRequestQty(prd.getRequestQty());
+				pod.setVariant(prd.getVariant());
+				podDao.save(pod);
+			}
+		}
+		
+		PurchaseOrderHistory poh = new PurchaseOrderHistory();
+		poh.setCreatedOn(po.getCreatedOn());
+		poh.setPurchaseOrder(po);
+		poh.setStatus(po.getStatus());
+		pohDao.save(poh);
+	}
+	
+	public List<PurchaseRequest> searchByStatus(String status){
+		return prDao.searchPRByStatus(status);
+	}
+	
+	public List<PurchaseRequest> searchPR(String search){
+		return prDao.searchPR(search);
+	}
+	
+	public List<PurchaseRequest> searchPRByDate(Date start, Date end){
+		return prDao.searchPRByDate(start, end);
 	}
 }

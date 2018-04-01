@@ -4,8 +4,8 @@
 	<hr style="border-color:black;">
 	<div class="row">
 		<div class="col-xs-3">
-			<div class="input-group">
-		       <button type="button" class="btn btn-default pull-right" id="pilih-tanggal-range">
+			<div class="form-group">
+		       <button type="button" class="btn btn-default pull-right btn-block" id="pilih-tanggal-range">
 		         <span>
 		           <i class="fa fa-calendar"></i> Pilih Tanggal
 		         </span>
@@ -15,31 +15,32 @@
 	    </div>
 	    
 	    <div class="col-xs-2">
-		    <div class="input-group">
+		    <div class="form-group">
 		    	<select id="pil-status" class="form-control">
 		    		<option value="All">All</option>
 		    		<option value="Created">Created</option>
 		    		<option value="Submitted">Submitted</option>
 		    		<option value="Approved">Approved</option>
 		    		<option value="Rejected">Rejected</option>
+		    		<option value="PO Created">PO Created</option>
 		    	</select>
 		    </div>
 	    </div>
 	    
 	    <div class="col-xs-3">
-		    <div class="input-group">
+		    <div class="form-group">
 		    	<input type="text" id="cari-pr" class="form-control" placeholder="Search...">
 		    </div>
 	    </div>
 	    
 	    <div class="col-xs-2">
-		    <div class="input-group">
-		    	<input type="button" id="btn-export" class="btn btn-md btn-primary float-right" value="Export">
+		    <div class="form-group">
+		    	<input type="button" id="btn-export" class="btn btn-md btn-primary float-right btn-block" value="Export">
 		    </div>
 	    </div>
 	    <div class="col-xs-2">
-		    <div class="input-group">
-		    	<input type="button" id="btn-create" class="btn btn-md btn-primary float-right" value="Create" data-toggle="modal" data-target="#create-pr">
+		    <div class="form-group">
+		    	<input type="button" id="btn-create" class="btn btn-md btn-primary float-right btn-block" value="Create" data-toggle="modal" data-target="#create-pr">
 		    </div>
 	    </div>
 	</div>
@@ -55,12 +56,27 @@
 		<tbody id="isi-data-pr">
 			<c:forEach items="${prs }" var="pr">
 				<tr>
-					<td>${pr.createdOn }</td>
+					<td>
+						<script>
+							var waktu = '${pr.createdOn}';
+							var wkt = waktu.split('.');
+							var tanggalJam = wkt[0].split(' ');
+							var tgl = tanggalJam[0].split('-');
+							var tanggal = tgl[2]+'-'+tgl[1]+'-'+tgl[0];
+							document.write(tanggal+' '+tanggalJam[1]);
+						</script>
+					</td>
 					<td>${pr.prNo }</td>
 					<td>${pr.notes }</td>
 					<td>${pr.status }</td>
 					<td>
-						<input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="${pr.id }"> | 
+						<script>
+							if('${pr.status}' == 'Created'){
+								document.write('<input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="${pr.id }"> |');
+							}else {
+								document.write('<input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="${pr.id }" disabled> |');
+							}
+						</script> 
 						<a href='${pageContext.request.contextPath}/transaksi/purchase-request/detail/${pr.id}' class="btn-view-pr btn btn-info" key-id="${pr.id }">View</a>
 					</td>
 				</tr>
@@ -278,7 +294,7 @@
 							$('#list-barang').append(
 								'<tr id = "tr'+val.id+'"><td>'+ val.itemVariant.item.name +'-'+ val.itemVariant.name +'</td>'
 								+'<td id="inStock'+ val.id +'">'+ val.beginning +'</td>'
-								+'<td id="td-qty'+ val.id +'"><input type="number" id="reqQty'+ val.id +'" value="1" /></td>'
+								+'<td id="td-qty'+ val.id +'"><input type="number" mmin="1" max="1000" id="reqQty'+ val.id +'" value="1" /></td>'
 								+'<td><button type="button" id="'+ val.id +'" class="tbl-add-brg btn btn-primary btn-add'+val.id
 								+'" key-id="'+val.itemVariant.id+'">Add</button></td></tr>');
 						});
@@ -358,6 +374,63 @@
 			$('#list-item').empty();
 			$('#in-notes').val('');
 		}
+		
+		$('#pil-status').change(function(){
+			var status = $(this).val();
+			if(status == 'All'){
+				table
+					.columns( 3 )
+			        .search('')
+			        .draw();
+			}else{
+				table
+			        .columns( 3 )
+			        .search( this.value )
+			        .draw();
+			}
+			/* $.ajax({
+				type : 'GET',
+				url : '${pageContext.request.contextPath}/transaksi/purchase-request/search-status?search='+status,
+				dataType : 'json',
+				success : function(data){
+					$('#isi-data-pr').empty();
+					console.log(data);
+					$.each(data, function(key, val){
+						console.log(val);
+						var waktu = String(val.createdOn);
+						var wkt = waktu.split('.');
+						var tanggalJam = wkt[0].split(' ');
+						var tgl = tanggalJam[0].split('-');
+						var tanggal = tgl[2]+'-'+tgl[1]+'-'+tgl[0];
+						var tampil = tanggal+' '+tanggalJam[1];
+						console.log(tampil);
+						$('#isi-data-pr').append('<tr>'
+							+'<td>'+val.createdOn+'</td>'
+							+'<td>'+val.prNo+'</td>'
+							+'<td>'+val.notes+'</td>'
+							+'<td>'+val.status+'</td>'
+							+'<td><input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="'+val.id+'" disabled> |'
+							+'<a href="${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+val.id+'" class="btn-view-pr btn btn-info" key-id="'+val.id+'">View</a></td>'
+							+'</tr>');
+					});
+				},
+				error : function(){
+					$('#isi-data-pr').empty();
+				}
+			}); */
+		});
+			
+		var table = $('#data-pr').DataTable({
+			'paging'      : true,
+		    'lengthChange': false,
+		    'searching'   : true,
+		    'ordering'    : true,
+		    'info'        : true,
+		    'autoWidth'   : false,
+		    'pageLength'  : 5
+		});
+		
 	});
+	
 </script>
 </html>

@@ -4,15 +4,15 @@
 			<div class="row">
 				<div class="col-xs-3">
 					<input type="hidden" id="in-id">
-					<input type="text" class="form-control" id="in-firstname" placeholder="First Name" data-parsley-required="true"></div>
+					<input type="text" class="form-control" id="in-firstname" placeholder="First Name" data-parsley-required="true" required></div>
 				<div class="col-xs-3">
-					<input type="text" class="form-control" id="in-lastname" placeholder="Last Name" data-parsley-required="true">
+					<input type="text" class="form-control" id="in-lastname" placeholder="Last Name" data-parsley-required="true" required>
 				</div>
 				<div class="col-xs-3">
-					<input type="email" class="form-control" id="in-email" placeholder="Email" data-parsley-required="true" data-parsley-type="email">
+					<input type="email" class="form-control" id="in-email" placeholder="Email" data-parsley-required="true" data-parsley-type="email" required>
 				</div>
 				<div class="col-xs-3">
-					<select id="in-title" class="form-control" style="font-size: 16px; font-family: raleway;">
+					<select id="in-title" class="form-control" style="font-size: 16px; font-family: raleway;" data-parsley-required="true" required >
 						<option value="Mr.">Mr.</option>
 						<option value="Mrs.">Mrs.</option>
 					</select>
@@ -172,17 +172,25 @@
 	        if (this.checked) {
 	            $('#buat-akun').fadeIn('fast');
 	        	$('#in-username').attr('data-parsley-required', true);
+	        	$('#in-username').prop('required', true);
 	        	$('#in-password').attr('data-parsley-required', true);
+	        	$('#in-password').prop('required', true);
 	        }else{ 
 	            $('#buat-akun').fadeOut('fast');
 	        	$('#in-username').attr('data-parsley-required', false);
+	        	$('#in-username').prop('required', false);
         		$('#in-password').attr('data-parsley-required', false);
+        		$('#in-password').prop('required', false);
 	        }
 	    });
 	    $('#cek-akun').change();
 	    
 	    $('#btn-batal').click(function(){
 	    	$('#buat-akun').fadeOut('fast');
+	    	emailEdit = '';
+			userEdit = '';
+			emailValid = 0;
+			userValid = 0;
 	    });
 	    
 	    $('#data-emp').on('click', '.nonaktifkan', function(){
@@ -225,11 +233,13 @@
 					$('#in-lastname').val(data.lastName);
 					$('#in-title').val(data.title);
 					$('#in-email').val(data.email);
+					emailEdit = data.email;
 					if(data.haveAccount == 1){
 						$('#cek-akun').prop('checked', true);
 						$('#buat-akun').fadeIn('fast');
 						$('#in-id-user').val(data.user.id);
 						$('#in-username').val(data.user.username);
+						userEdit = data.user.username;
 						$('#in-password').val(data.user.password);
 						$('#pilih-role').val(data.user.role.id);
 					}else if(data.haveAccount == 0 && data.user.active == 1){
@@ -280,6 +290,8 @@
 						"id" : $('#pilih-role').val()
 					}
 				}
+			}else{
+				userValid = 1;
 			};
 			
 			var employee = {
@@ -296,7 +308,7 @@
 			console.log(employee);
 			validate = $('#form-emp').parsley();
 			validate.validate();
-			if(validate.isValid()){
+			if(validate.isValid() && emailValid == 1 && userValid == 1){
 				$.ajax({
 					type : 'post',
 					url : '${pageContext.request.contextPath}/employee/save',
@@ -313,6 +325,53 @@
 			}
 		}); // end fungsi simpan
 
+		var emailEdit = '';
+		var userEdit = '';
+		var emailValid = 0;
+		var userValid = 0;
+		
+		// cek username
+		$('#in-username').on('input',function(){
+			var username = $('#in-username').val();
+			$.ajax({
+				type : 'get',
+				url : '${pageContext.request.contextPath}/employee/cek-user?user='+username,
+				success : function(data){
+					if(data > 0 && $('#cek-akun').is(":checked") && username != userEdit){
+						// Non unique
+						$('#btn-simpan').prop('disabled', true);
+						userValid = 0;
+					}else {
+						// unique
+						$('#btn-simpan').prop('disabled', false);
+						userValid = 1;
+					}
+				}, error : function(){
+					console.log('gagal')
+				}
+			});
+		});
+		
+		$('#in-email').on('input',function(){
+			var email = $('#in-email').val();
+			$.ajax({
+				type : 'get',
+				url : '${pageContext.request.contextPath}/employee/cek-email?email='+email,
+				success : function(data){
+					if(data > 0 && email != emailEdit){
+						// Non unique
+						$('#btn-simpan').prop('disabled', true);
+						emailValid = 0;
+					}else{
+						// unique
+						$('#btn-simpan').prop('disabled', false);
+						emailValid = 1;
+					}
+				}, error : function(){
+					console.log('gagal')
+				}
+			});
+		});
 	});
 </script>
 <script>

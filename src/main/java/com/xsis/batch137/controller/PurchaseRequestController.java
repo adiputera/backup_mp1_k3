@@ -1,5 +1,6 @@
 package com.xsis.batch137.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,5 +95,23 @@ public class PurchaseRequestController {
 	@ResponseStatus(HttpStatus.OK)
 	public void createPo(@PathVariable long id) {
 		prService.createPo(id);
+	}
+	
+	@RequestMapping("/search-status")
+	@ResponseBody
+	public List<PurchaseRequest> searchByStatus(@RequestParam(value="search", defaultValue="") String search){
+		return prService.searchByStatus(search);
+	}
+	
+	@RequestMapping("/search")
+	@ResponseBody
+	public List<PurchaseRequest> search(@RequestParam(value="search", defaultValue="") String search){
+		return prService.searchPR(search);
+	}
+	
+	@RequestMapping("/search-date")
+	@ResponseBody
+	public List<PurchaseRequest> searchByDate(@RequestParam(value="start", defaultValue="") Date start, @RequestParam(value="end", defaultValue="") Date end){
+		return prService.searchPRByDate(start, end);
 	}
 }

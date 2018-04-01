@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.xsis.batch137.dao.ProvinceDao;
 import com.xsis.batch137.model.Province;
 
+
+
 @Service
 @Transactional
 public class ProvinceService {
@@ -16,7 +18,9 @@ public class ProvinceService {
 	@Autowired
 	ProvinceDao provinceDao;
 	
-	public List<Province> selectAll() {
+	
+	public List<Province> selectAll(){
 		return provinceDao.selectAll();
 	}
+	
 }

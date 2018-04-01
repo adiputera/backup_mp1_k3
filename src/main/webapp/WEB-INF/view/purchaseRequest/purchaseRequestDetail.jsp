@@ -42,25 +42,16 @@
 	</div>
 </div>
 <div class="row">
-<div class="col-xs-4">
-<table class="table table-hover">
+<div class="col-xs-12">
+<table class="table table-hover table-borderless">
 	<tr>
-		<th>PR Number</th>
-		<td></td>
-		<td>:</td>
-		<td>${pr.prNo }</td>
+		<td><b>PR Number</b> : ${pr.prNo }</td>
 	</tr>
 	<tr>
-		<th>Created By</th>
-		<td></td>
-		<td>:</td>
-		<td>${pr.createdBy }</td>
+		<td><b>Created By</b> : ${pr.createdBy }</td>
 	</tr>
 	<tr>
-		<th>Target Waktu Item Ready</th>
-		<td></td>
-		<td> : </td>
-		<td>
+		<td><b>Target Waktu Item Ready</b> : 
 			<script>
 				var tanggal = '${pr.readyTime}';
 				var tgl = tanggal.split('-');
@@ -69,40 +60,36 @@
 		</td>
 	</tr>
 	<tr>
-		<th>PR Status</th>
-		<td></td>
-		<td> : </td>
-		<td id="status">${pr.status }</td>
+		<td><b>PR Status</b> : ${pr.status }</td>
 	</tr>
 </table>
 </div>
 </div>
 <div class="form-group">
 	<label for="input-note">Notes</label>
-	<textarea class="form-control" id="input-note" rows="5"
-		disabled="disabled">${pr.notes }</textarea>
+	<textarea class="form-control" id="input-note" rows="5" style="resize:none;" readonly>${pr.notes }</textarea>
 </div>
 <h5>
 	<b>Status History</b>
 </h5>
 <hr style="border-color: black; border-top: 1px dashed;">
 <div class="row">
-	<div class="col-xs-5">
-		<table id="data-history" class="table table-striped table-bordered table-hover">
+	<div class="col-xs-8">
+		<table id="data-history" class="table table-striped table-hover table-borderless">
 			<c:forEach items="${pr.history }" var="his">
 				<tr>
-					<td>On</td>
-					<td>
+					<td>On
+					
 						<script>
 							var waktu = '${his.createdOn}';
 							var wkt = waktu.split('.');
 							document.write(wkt[0]);
 						</script>
-					</td>
-					<td>-</td>
-					<td>${pr.prNo }</td>
-					<td>is</td>
-					<td>${his.status }</td>
+					
+					-
+					${pr.prNo }
+					is
+					${his.status }</td>
 				</tr>
 			</c:forEach>
 		</table>
@@ -130,6 +117,10 @@
 		</c:forEach>
 	</tbody>
 </table>
+<div class="row">
+	<div class="col-xs-9"></div>
+	<div class="col-xs-3"><a href="${pageContext.request.contextPath}/transaksi/purchase-request" class="btn btn-primary btn-block">Done</a></div>
+</div>
 </section>
 </body>
 <script>
@@ -138,17 +129,21 @@
 		$('#action-pr').change(function(){
 			var action = $(this).val();
 			var id = $(this).attr('key-id');
-			$.ajax({
-				type : 'GET',
-				url : '${pageContext.request.contextPath}/transaksi/purchase-request/'+action+'/'+id,
-				success : function(){
-					console.log('sukses');
-					window.location = '${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+id;
-				},
-				error : function(){
-					console.log('gagal');
-				}
-			});
+			if(action == 'print'){
+				window.print();
+			}else{
+				$.ajax({
+					type : 'GET',
+					url : '${pageContext.request.contextPath}/transaksi/purchase-request/'+action+'/'+id,
+					success : function(){
+						console.log('sukses');
+						window.location = '${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+id;
+					},
+					error : function(){
+						console.log('gagal');
+					}
+				});
+			}
 		});
 	})
 </script>
