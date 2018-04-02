@@ -42,16 +42,16 @@
 	</div>
 </div>
 <div class="row">
-<div class="col-xs-12">
+<div class="col-xs-8">
 <table class="table table-hover table-borderless">
 	<tr>
-		<td><b>PR Number</b> : ${pr.prNo }</td>
+		<td>PR Number : ${pr.prNo }</td>
 	</tr>
 	<tr>
-		<td><b>Created By</b> : ${pr.createdBy }</td>
+		<td>Created By : ${pr.createdBy }</td>
 	</tr>
 	<tr>
-		<td><b>Target Waktu Item Ready</b> : 
+		<td>Target Waktu Item Ready : 
 			<script>
 				var tanggal = '${pr.readyTime}';
 				var tgl = tanggal.split('-');
@@ -60,7 +60,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td><b>PR Status</b> : ${pr.status }</td>
+		<td>PR Status : ${pr.status }</td>
 	</tr>
 </table>
 </div>
@@ -75,21 +75,16 @@
 <hr style="border-color: black; border-top: 1px dashed;">
 <div class="row">
 	<div class="col-xs-8">
-		<table id="data-history" class="table table-striped table-hover table-borderless">
+		<table id="data-history" class="table table-striped table-borderless table-hover">
 			<c:forEach items="${pr.history }" var="his">
 				<tr>
-					<td>On
-					
+					<td>On 
 						<script>
 							var waktu = '${his.createdOn}';
 							var wkt = waktu.split('.');
 							document.write(wkt[0]);
 						</script>
-					
-					-
-					${pr.prNo }
-					is
-					${his.status }</td>
+					- ${pr.prNo } is ${his.status }</td>
 				</tr>
 			</c:forEach>
 		</table>
@@ -111,7 +106,18 @@
 		<c:forEach items="${pr.detail }" var ="prd">
 			<tr>
 				<td>${prd.variant.item.name }-${prd.variant.name }</td>
-				<td>null</td>
+				<td id="td${prd.id }">
+					<script type="text/javascript">
+							$.ajax({
+								type : 'GET',
+								url : '${pageContext.request.contextPath}/transaksi/purchase-request/get-inventory?idPr='+${pr.id}+'&idPrd='+${prd.id},
+								dataType: 'json',
+								success : function(inv){
+									$('#td${prd.id}').append('<td>'+inv[0]+'<td>');
+								}
+							});
+					</script>
+				</td>
 				<td>${prd.requestQty }</td>
 			</tr>
 		</c:forEach>

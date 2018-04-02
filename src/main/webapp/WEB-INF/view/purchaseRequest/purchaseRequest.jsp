@@ -5,7 +5,7 @@
 	<div class="row">
 		<div class="col-xs-3">
 			<div class="form-group">
-		       <button type="button" class="btn btn-default pull-right btn-block" id="pilih-tanggal-range">
+		       <button type="button" class="btn btn-default btn-block" id="pilih-tanggal-range">
 		         <span>
 		           <i class="fa fa-calendar"></i> Pilih Tanggal
 		         </span>
@@ -22,7 +22,6 @@
 		    		<option value="Submitted">Submitted</option>
 		    		<option value="Approved">Approved</option>
 		    		<option value="Rejected">Rejected</option>
-		    		<option value="PO Created">PO Created</option>
 		    	</select>
 		    </div>
 	    </div>
@@ -35,12 +34,12 @@
 	    
 	    <div class="col-xs-2">
 		    <div class="form-group">
-		    	<input type="button" id="btn-export" class="btn btn-md btn-primary float-right btn-block" value="Export">
+		    	<input type="button" id="btn-export" class="btn btn-md btn-primary btn-block" value="Export">
 		    </div>
 	    </div>
 	    <div class="col-xs-2">
 		    <div class="form-group">
-		    	<input type="button" id="btn-create" class="btn btn-md btn-primary float-right btn-block" value="Create" data-toggle="modal" data-target="#create-pr">
+		    	<input type="button" id="btn-create" class="btn btn-md btn-primary btn-block" value="Create" data-toggle="modal" data-target="#create-pr">
 		    </div>
 	    </div>
 	</div>
@@ -60,10 +59,7 @@
 						<script>
 							var waktu = '${pr.createdOn}';
 							var wkt = waktu.split('.');
-							var tanggalJam = wkt[0].split(' ');
-							var tgl = tanggalJam[0].split('-');
-							var tanggal = tgl[2]+'-'+tgl[1]+'-'+tgl[0];
-							document.write(tanggal+' '+tanggalJam[1]);
+							document.write(wkt[0]);
 						</script>
 					</td>
 					<td>${pr.prNo }</td>
@@ -182,7 +178,7 @@
 		        ranges   : {
 		          'Hari Ini'       : [moment(), moment()],
 		          'Kemarin'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-		          '7 Hari Terakhit' : [moment().subtract(6, 'days'), moment()],
+		          '7 Hari Terakhir' : [moment().subtract(6, 'days'), moment()],
 		          'Sebulan Terakhir': [moment().subtract(29, 'days'), moment()],
 		          'Bulan ini'  : [moment().startOf('month'), moment().endOf('month')],
 		          'Bulan lalu'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
@@ -196,7 +192,8 @@
 	    );
 	    
 	    $('#pilih-tanggal').datepicker({
-      		autoclose: true
+      		autoclose: true,
+      		startDate : new Date(),
     	});
 	    
 	    $('#tblsimpan').on('click',function(evt) {
@@ -313,16 +310,17 @@
 			var itemVar = element.find('td').eq(0).text();
 			var inStock = element.find('td').eq(1).text();
 			var reqQty = $('#reqQty'+id).val();
-			if(added.indexOf(id.toString()) == -1) {
+			if(added.indexOf(variantId.toString()) == -1) {
 				$('#list-item').append(
-					'<tr key-id="'+variantId+'" id="'+id+'"><td>'+itemVar+'</td>'
+					'<tr key-id="'+variantId+'" id="'+variantId+'"><td>'+itemVar+'</td>'
 					+'<td>'+inStock+'</td>'
 					+'<td>'+reqQty+'</td>'
 					+'<td><button type="button" class="btn btn-danger btn-hapus-barang" id="btn-del'+id+'" key-id="'+id+'">&times;</button>'
 				);
-				added.push(id);
+				added.push(variantId);
+				console.log(added);
 			}else{
-				var target = $('#list-item > #'+id+'');
+				var target = $('#list-item > #'+variantId+'');
 				var oldReq = target.find('td').eq(2).text();
 				var newReq = parseInt(oldReq)+parseInt(reqQty);
 				target.find('td').eq(2).text(newReq);
@@ -340,6 +338,7 @@
 		
 		$('#data-pr').on('click', '.btn-edit-pr', function(){
 			console.log('edit');
+			added= [];
 			$('#list-item').empty();
 			var id = $(this).attr('key-id');
 			$.ajax({
@@ -354,12 +353,22 @@
 					var tanggal = tgl[1]+'/'+tgl[2]+'/'+tgl[0];
 					$('#pilih-tanggal').val(tanggal);
 					$(data.detail).each(function(key, val){
+						added.push(''+val.variant.id+'');
+						console.log(added);
 						$('#list-item').append(
-							'<tr key-id="'+val.variant.id+'"><td>'+val.variant.item.name+'-'+val.variant.name+'</td>'
-							+'<td>null</td>'
+							'<tr key-id="'+val.variant.id+'" id="'+val.variant.id+'"><td>'+val.variant.item.name+'-'+val.variant.name+'</td>'
+							+'<td id="td'+val.id+'"></td>'
 							+'<td>'+val.requestQty+'</td>'
 							+'<td><button type="button" class="btn btn-danger btn-hapus-barang" id="btn-del'+id+'" key-id="'+id+'">&times;</button>'
 						);
+						$.ajax({
+							type : 'GET',
+							url : '${pageContext.request.contextPath}/transaksi/purchase-request/get-inventory?idPr='+id+'&idPrd='+val.id,
+							dataType: 'json',
+							success : function(inv){
+								$('#td'+val.id).append(inv[0]);
+							}
+						});
 					})
 					$('#create-pr').modal('show');
 				}, 
@@ -369,68 +378,49 @@
 			});
 		});
 		
-		function clearForm(){
-			$('#in-id').val('');
-			$('#list-item').empty();
-			$('#in-notes').val('');
-		}
+		function demoFromHTML() {
+	        var pdf = new jsPDF('p', 'pt', 'letter');
+	        // source can be HTML-formatted string, or a reference
+	        // to an actual DOM element from which the text will be scraped.
+	        source = $('.content')[0];
+
+	        // we support special element handlers. Register them with jQuery-style 
+	        // ID selector for either ID or node name. ("#iAmID", "div", "span" etc.)
+	        // There is no support for any other type of selectors 
+	        // (class, of compound) at this time.
+	        specialElementHandlers = {
+	            // element with id of "bypass" - jQuery style selector
+	            '#bypassme': function (element, renderer) {
+	                // true = "handled elsewhere, bypass text extraction"
+	                return true
+	            }
+	        };
+	        margins = {
+	            top: 80,
+	            bottom: 60,
+	            left: 40,
+	            width: 522
+	        };
+	        // all coords and widths are in jsPDF instance's declared units
+	        // 'inches' in this case
+	        pdf.fromHTML(
+	        source, // HTML string or DOM elem ref.
+	        margins.left, // x coord
+	        margins.top, { // y coord
+	            'width': margins.width, // max width of content on PDF
+	            'elementHandlers': specialElementHandlers
+	        },
+
+	        function (dispose) {
+	            // dispose: object with X, Y of the last line add to the PDF 
+	            //          this allow the insertion of new lines after html
+	            pdf.save('Test.pdf');
+	        }, margins);
+	    }
 		
-		$('#pil-status').change(function(){
-			var status = $(this).val();
-			if(status == 'All'){
-				table
-					.columns( 3 )
-			        .search('')
-			        .draw();
-			}else{
-				table
-			        .columns( 3 )
-			        .search( this.value )
-			        .draw();
-			}
-			/* $.ajax({
-				type : 'GET',
-				url : '${pageContext.request.contextPath}/transaksi/purchase-request/search-status?search='+status,
-				dataType : 'json',
-				success : function(data){
-					$('#isi-data-pr').empty();
-					console.log(data);
-					$.each(data, function(key, val){
-						console.log(val);
-						var waktu = String(val.createdOn);
-						var wkt = waktu.split('.');
-						var tanggalJam = wkt[0].split(' ');
-						var tgl = tanggalJam[0].split('-');
-						var tanggal = tgl[2]+'-'+tgl[1]+'-'+tgl[0];
-						var tampil = tanggal+' '+tanggalJam[1];
-						console.log(tampil);
-						$('#isi-data-pr').append('<tr>'
-							+'<td>'+val.createdOn+'</td>'
-							+'<td>'+val.prNo+'</td>'
-							+'<td>'+val.notes+'</td>'
-							+'<td>'+val.status+'</td>'
-							+'<td><input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="'+val.id+'" disabled> |'
-							+'<a href="${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+val.id+'" class="btn-view-pr btn btn-info" key-id="'+val.id+'">View</a></td>'
-							+'</tr>');
-					});
-				},
-				error : function(){
-					$('#isi-data-pr').empty();
-				}
-			}); */
-		});
-			
-		var table = $('#data-pr').DataTable({
-			'paging'      : true,
-		    'lengthChange': false,
-		    'searching'   : true,
-		    'ordering'    : true,
-		    'info'        : true,
-		    'autoWidth'   : false,
-		    'pageLength'  : 5
-		});
-		
+		$('#btn-export').on('click', function(){
+			demoFromHTML();
+		})
 	});
-	
 </script>
 </html>

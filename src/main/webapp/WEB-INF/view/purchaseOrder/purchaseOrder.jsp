@@ -4,7 +4,7 @@
 	<hr style="border-color:black;">
 	<div class="row">
 		<div class="col-xs-3">
-			<div class="input-group">
+			<div class="form-group">
 		       <button type="button" class="btn btn-default pull-right btn-block" id="pilih-tanggal-range">
 		         <span>
 		           <i class="fa fa-calendar"></i> Pilih Tanggal
@@ -15,7 +15,7 @@
 	    </div>
 	    
 	    <div class="col-xs-2">
-		    <div class="input-group">
+		    <div class="form-group">
 		    	<select id="pil-status" class="form-control">
 		    		<option value="All">All</option>
 		    		<option value="Created">Created</option>
@@ -27,24 +27,24 @@
 	    </div>
 	    
 	    <div class="col-xs-3">
-		    <div class="input-group">
+		    <div class="form-group">
 		    	<input type="text" id="cari-pr" class="form-control" placeholder="Search...">
 		    </div>
 	    </div>
 	    
 	    <div class="col-xs-2">
-		    <div class="input-group">
+		    <div class="form-group">
 		    	
 		    </div>
 	    </div>
 	    <div class="col-xs-2">
-		    <div class="input-group">
+		    <div class="form-group">
 		    	<input type="button" id="btn-export" class="btn btn-md btn-primary float-right btn-block" value="Export">
 		    </div>
 	    </div>
 	</div>
 	<hr>
-	<table id="data-pr" class="table table-striped table-bordered table-hover">
+	<table id="data-po" class="table table-striped table-bordered table-hover">
 		<thead class="thead-light">
 			<th>Create Date</th>
 			<th>Supplier</th>
@@ -53,7 +53,7 @@
 			<th>Status</th>
 			<th>#</th>
 		</thead>
-		<tbody id="isi-data-pr">
+		<tbody id="isi-data-po">
 			<c:forEach items="${pos }" var="po">
 				<tr>
 					<td>
@@ -112,15 +112,11 @@
 	                <hr style="border-color:black;">
 	                <table id="data-purchase-item" class="table table-striped table-bordered table-hover">
 	                	<thead>
-	                		<th>
-	                			Item
-	                		</th>
-	                		<th>
-	                			In Stock
-	                		</th>
-	                		<th>
-	                			Request Qty.
-	                		</th>
+	                		<th>Item</th>
+	                		<th>In Stock</th>
+	                		<th>Qty.</th>
+	                		<th>Unit Cost</th>
+	                		<th>Sub Total</th>
 	                	</thead>
 	                	<tbody id = "list-item">
 	                	</tbody>
@@ -138,37 +134,7 @@
 		</div>
 	</div>
 	
-	<div id="add-item-pr" class="modal fade" role="dialog">
-		<div class="modal-dialog modal-confirm">
-			<div class="modal-content">
-				<div class="modal-header">
-					
-					<button type="button" class="close" data-dismiss="modal"
-						aria-hidden="true">&times;</button>
-					<h4 class="modal-title">Add Purchase Item</h4>
-				</div>
-				<div class="modal-body">
-					<input type="text" id="search-item" class="form-control">
-					<table id="data-barang" class="table table-striped table-bordered table-hover">
-						<thead>
-							<th>Item</th>
-							<th>In Stock</th>
-							<th>Request Qty.</th>
-						</thead>
-						<tbody id="list-barang">
-							
-						</tbody>
-					</table>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-info" data-dismiss="modal"
-						id="batal-insert">Cancel</button>
-					<button type="button" class="btn btn-danger" id="tblkonfdel"
-						key="key">Add</button>
-				</div>
-			</div>
-		</div>
-	</div>
+	
 </section>
 </body>
 <script>
@@ -192,7 +158,8 @@
 	    );
 	    
 	    $('#pilih-tanggal').datepicker({
-      		autoclose: true
+      		autoclose: true,
+      		startDate : new Date()
     	});
 	    
 	    $('#tblsimpan').on('click',function(evt) {
@@ -243,121 +210,27 @@
 				});
 			//}
 		}); // end fungsi simpan
-	    
-		var added = [];
 		
-		// auto complete
-		var itemsss = [];
-		var itemss = {
-				data : itemsss,
-		};
-		
-		$('#search-item').easyAutocomplete(itemss);
-		
-		$('#btn-tambah-item').on('click', function(){
-			$.ajax({
-				type : 'get',
-				url : '${pageContext.request.contextPath}/item/get-inventory',
-				dataType : 'json',
-				success : function(data){
-					$.each(data, function(key, val) {
-						var namaItem = val.itemVariant.item.name +'-'+ val.itemVariant.name;
-						itemsss.push(namaItem);
-					});
-				}, error : function(){
-					
-				}
-			});
-		});
-		
-		$(".easy-autocomplete").removeAttr("style");
-		
-		// fungsi search
-	    $('#search-item').on('input',function(e){
-	    	console.log(itemsss);
-			var word = $(this).val();
-			if (word=="") {
-				$('#list-barang').empty();
-			} else {
-				$.ajax({
-					type : 'GET',
-					url : '${pageContext.request.contextPath}/transaksi/purchase-request/search-item?search='+word,
-					dataType: 'json',
-					success : function(data){
-						console.log(data);
-						$('#list-barang').empty();
-						$.each(data, function(key, val) {
-							$('#list-barang').append(
-								'<tr id = "tr'+val.id+'"><td>'+ val.itemVariant.item.name +'-'+ val.itemVariant.name +'</td>'
-								+'<td id="inStock'+ val.id +'">'+ val.beginning +'</td>'
-								+'<td id="td-qty'+ val.id +'"><input type="number" mmin="1" max="1000" id="reqQty'+ val.id +'" value="1" /></td>'
-								+'<td><button type="button" id="'+ val.id +'" class="tbl-add-brg btn btn-primary btn-add'+val.id
-								+'" key-id="'+val.itemVariant.id+'">Add</button></td></tr>');
-						});
-					}, 
-					error : function(){
-						$('#list-barang').empty();
-					}
-				});
-			}
-		}); // end fungsi search
-		
-		$('#list-barang').on('click', '.tbl-add-brg', function(){
-			var element = $(this).parent().parent();
-			var id = $(this).attr('id');
-			var variantId = $(this).attr('key-id');
-			var itemVar = element.find('td').eq(0).text();
-			var inStock = element.find('td').eq(1).text();
-			var reqQty = $('#reqQty'+id).val();
-			if(added.indexOf(id.toString()) == -1) {
-				$('#list-item').append(
-					'<tr key-id="'+variantId+'" id="'+id+'"><td>'+itemVar+'</td>'
-					+'<td>'+inStock+'</td>'
-					+'<td>'+reqQty+'</td>'
-					+'<td><button type="button" class="btn btn-danger btn-hapus-barang" id="btn-del'+id+'" key-id="'+id+'">&times;</button>'
-				);
-				added.push(id);
-			}else{
-				var target = $('#list-item > #'+id+'');
-				var oldReq = target.find('td').eq(2).text();
-				var newReq = parseInt(oldReq)+parseInt(reqQty);
-				target.find('td').eq(2).text(newReq);
-			}
-		});
-		
-		$('#data-purchase-item').on('click', '.btn-hapus-barang', function(){
-			var id = $(this).attr('key-id');
-			$(this).parent().parent().remove();
-			var index = added.indexOf(id.toString());
-			if(index > -1){
-				added.splice(index, 1);
-			}
-		});
-		
-		$('#data-pr').on('click', '.btn-edit-pr', function(){
+		$('#data-po').on('click', '.btn-edit-po', function(){
 			console.log('edit');
 			$('#list-item').empty();
 			var id = $(this).attr('key-id');
 			$.ajax({
 				type : 'GET',
-				url : '${pageContext.request.contextPath}/transaksi/purchase-request/get-one/'+id,
+				url : '${pageContext.request.contextPath}/transaksi/purchase-order/get-one/'+id,
 				dataType: 'json',
 				success : function(data){
 					console.log(data);
 					$('#in-notes').val(data.notes);
 					$('#in-id').val(data.id);
-					var tgl = data.readyTime.split('-');
-					var tanggal = tgl[1]+'/'+tgl[2]+'/'+tgl[0];
-					$('#pilih-tanggal').val(tanggal);
 					$(data.detail).each(function(key, val){
 						$('#list-item').append(
 							'<tr key-id="'+val.variant.id+'"><td>'+val.variant.item.name+'-'+val.variant.name+'</td>'
 							+'<td>null</td>'
 							+'<td>'+val.requestQty+'</td>'
-							+'<td><button type="button" class="btn btn-danger btn-hapus-barang" id="btn-del'+id+'" key-id="'+id+'">&times;</button>'
 						);
 					})
-					$('#create-pr').modal('show');
+					$('#edit-po').modal('show');
 				}, 
 				error : function(){
 					console.log('gagal');

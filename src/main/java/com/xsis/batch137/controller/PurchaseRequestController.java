@@ -1,6 +1,5 @@
 package com.xsis.batch137.controller;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import com.xsis.batch137.model.Item;
 import com.xsis.batch137.model.ItemInventory;
 import com.xsis.batch137.model.Outlet;
 import com.xsis.batch137.model.PurchaseRequest;
+import com.xsis.batch137.model.PurchaseRequestDetail;
 import com.xsis.batch137.service.ItemInventoryService;
 import com.xsis.batch137.service.OutletService;
 import com.xsis.batch137.service.PurchaseRequestService;
@@ -97,21 +97,9 @@ public class PurchaseRequestController {
 		prService.createPo(id);
 	}
 	
-	@RequestMapping("/search-status")
+	@RequestMapping("/get-inventory")
 	@ResponseBody
-	public List<PurchaseRequest> searchByStatus(@RequestParam(value="search", defaultValue="") String search){
-		return prService.searchByStatus(search);
-	}
-	
-	@RequestMapping("/search")
-	@ResponseBody
-	public List<PurchaseRequest> search(@RequestParam(value="search", defaultValue="") String search){
-		return prService.searchPR(search);
-	}
-	
-	@RequestMapping("/search-date")
-	@ResponseBody
-	public List<PurchaseRequest> searchByDate(@RequestParam(value="start", defaultValue="") Date start, @RequestParam(value="end", defaultValue="") Date end){
-		return prService.searchPRByDate(start, end);
+	public List<Object> getInventory(@RequestParam(value="idPr", defaultValue="") long idPr, @RequestParam(value="idPrd", defaultValue="") long idPrd){
+		return prService.getInventoryByVariantDanOutlet(idPrd, idPr);
 	}
 }

@@ -5,9 +5,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.xsis.batch137.model.PurchaseOrder;
+import com.xsis.batch137.model.PurchaseRequest;
 import com.xsis.batch137.model.Supplier;
 import com.xsis.batch137.service.PurchaseOrderService;
 import com.xsis.batch137.service.SupplierService;
@@ -29,5 +33,24 @@ public class PurchaseOrderController {
 		model.addAttribute("pos", pos);
 		model.addAttribute("sups", sups);
 		return "purchaseOrder/purchaseOrder";
+	}
+	
+	@RequestMapping("/get-one/{id}")
+	@ResponseBody
+	public PurchaseOrder getOne(@PathVariable long id) {
+		return poService.getOne(id);
+	}
+	
+	@RequestMapping("/detail/{id}")
+	public String detail(@PathVariable long id, Model model) {
+		PurchaseOrder po = poService.getOne(id);
+		model.addAttribute("po", po);
+		return "purchaseOrder/purchaseOrderDetail";
+	}
+	
+	@RequestMapping("/get-inventory")
+	@ResponseBody
+	public List<Object> getInventory(@RequestParam(value="idPo", defaultValue="") long idPo, @RequestParam(value="idPod", defaultValue="") long idPod){
+		return poService.getInventoryByVariantDanOutlet(idPod, idPo);
 	}
 }
