@@ -71,13 +71,7 @@
 					<td>${po.grandTotal }
 					<td>${po.status }</td>
 					<td>
-						<script>
-							if('${po.status}' == 'Created'){
-								document.write('<input type="button" class="btn-edit-po btn btn-default" value="Edit" key-id="${po.id }"> |');
-							}else {
-								document.write('<input type="button" class="btn-edit-po btn btn-default" value="Edit" key-id="${po.id }" disabled> |');
-							}
-						</script> 
+						<input type="button" class="btn-edit-po btn btn-default" value="Edit" key-id="${po.id }"> | 
 						<a href='${pageContext.request.contextPath}/transaksi/purchase-order/detail/${po.id}' class="btn-view-pr btn btn-info" key-id="${pr.id }">View</a>
 					</td>
 				</tr>
@@ -97,7 +91,9 @@
 				<div class="modal-body">
 					<h4>choose Supplier : </h4>
 					<div class="form-group">
-						<select id="choose supplier" class="form-control">
+						<input type="hidden" id="in-id">
+						<input type="hidden" id="in-outlet">
+						<select id="pil-supplier" class="form-control">
 							<c:forEach items = "${sups }" var = "sup">
 								<option value = "${sup.id }">${sup.name }</option>
 							</c:forEach>
@@ -120,9 +116,13 @@
 	                	</thead>
 	                	<tbody id = "list-item">
 	                	</tbody>
+	                	<tfoot>
+							<tr style=" border: none; background: none;">
+								<td colspan="4"><strong>TOTAL</strong></td>
+								<td id="totalbanget"></td>
+							</tr>
+						</tfoot>
 	                </table>
-	                <button type="button" class="btn btn-md btn-primary btn-block" id="btn-tambah-item" data-toggle="modal" data-target="#add-item-pr">Add Item</button>
-	                
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-info" data-dismiss="modal"
@@ -164,45 +164,45 @@
 	    
 	    $('#tblsimpan').on('click',function(evt) {
 			evt.preventDefault();
-			var prd = [];
+			var pod = [];
 			
 			$('#list-item > tr').each(function(index,data) {
 				var detail = {
 						"requestQty" : $(this).find('td').eq(2).text(),
 						"variant" : {
 							"id" : $(this).attr('key-id')
-						}
+						},
+						"subTotal" : $(this).find('td').eq(4).text(),
+						"unitCost" : $('#cost'+$(this).attr('key-id')+'').val()
 				};
-				prd.push(detail);
+				pod.push(detail);
 				console.log(detail);
 			});
 			
-			var tgl = $('#pilih-tanggal').val().split('/');
-			var tanggal = tgl[2]+'-'+tgl[0]+'-'+tgl[1];
-			
-			var purReq = {
+			var purOrd = {
 				"id" : $('#in-id').val(),
 				"notes" : $('#in-notes').val(),
-				"status" : $('#in-status').val(),
 				"outlet" : {
-					"id" : $('#pil-outlet').val()
+					"id" : $('#in-outlet').val()
 				},
-				"detail" : prd,
+				"detail" : pod,
 				"status" : "Created",
-				"readyTime" : tanggal
+				"supplier" : {
+					"id" : $('#pil-supplier').val()
+				}
 			};
-			console.log(purReq);
+			console.log(purOrd);
 			//validate = $('#form-emp').parsley();
 			//validate.validate();
 			//if(validate.isValid()){
 				$.ajax({
-					type : 'post',
-					url : '${pageContext.request.contextPath}/transaksi/purchase-request/save',
-					data : JSON.stringify(purReq),
+					type : 'put',
+					url : '${pageContext.request.contextPath}/transaksi/purchase-order/update',
+					data : JSON.stringify(purOrd),
 					contentType : 'application/json',
 					success : function() {
 						console.log('simpan');
-						window.location = '${pageContext.request.contextPath}/transaksi/purchase-request';
+						window.location = '${pageContext.request.contextPath}/transaksi/purchase-order';
 					},
 					error : function() {
 						alert('save failed');
@@ -223,12 +223,25 @@
 					console.log(data);
 					$('#in-notes').val(data.notes);
 					$('#in-id').val(data.id);
+					$('#in-outlet').val(data.outlet.id);
+					$('#totalbanget').text(data.grandTotal);
+					//$('#pil-supplier').val(data.supplier.id);
 					$(data.detail).each(function(key, val){
 						$('#list-item').append(
 							'<tr key-id="'+val.variant.id+'"><td>'+val.variant.item.name+'-'+val.variant.name+'</td>'
-							+'<td>null</td>'
+							+'<td id="td'+val.id+'"></td>'
 							+'<td>'+val.requestQty+'</td>'
+							+'<td><input type="number" min="10000" max="10000000000" id="cost'+val.variant.id+'" placeholder="20000" value="'+val.unitCost+'" class="edit-cost form-control"></td>'
+							+'<td id="subtotal'+val.id+'">'+val.subTotal+'</td>'
 						);
+						$.ajax({
+							type : 'GET',
+							url : '${pageContext.request.contextPath}/transaksi/purchase-order/get-inventory?idPo='+id+'&idPod='+val.id,
+							dataType: 'json',
+							success : function(inv){
+								$('#td'+val.id).append(inv[0]);
+							}
+						});
 					})
 					$('#edit-po').modal('show');
 				}, 
@@ -238,11 +251,20 @@
 			});
 		});
 		
-		function clearForm(){
-			$('#in-id').val('');
-			$('#list-item').empty();
-			$('#in-notes').val('');
-		}
+		$('#list-item').on('keyup', '.edit-cost',function(e){
+			var cost = parseInt($(this).val());
+			var tr = $(this).parent().parent();
+			var subLoc = tr.find('td').eq(4);
+			var reqQty = parseInt(tr.find('td').eq(2).text());
+			var subTotal = cost*reqQty;
+			subLoc.text(subTotal);
+			var total = 0;
+			$('#list-item > tr').each(function(index,data) {
+				var subtot = parseInt($(this).find('td').eq(4).text());
+				total = total + subtot;
+			});
+			$('#totalbanget').text(total);
+		});
 	});
 </script>
 </html>
