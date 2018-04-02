@@ -22,6 +22,7 @@
 		    		<option value="Submitted">Submitted</option>
 		    		<option value="Approved">Approved</option>
 		    		<option value="Rejected">Rejected</option>
+		    		<option value="PO Created">PO Created</option>
 		    	</select>
 		    </div>
 	    </div>
@@ -66,13 +67,7 @@
 					<td>${pr.notes }</td>
 					<td>${pr.status }</td>
 					<td>
-						<script>
-							if('${pr.status}' == 'Created'){
-								document.write('<input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="${pr.id }"> |');
-							}else {
-								document.write('<input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="${pr.id }" disabled> |');
-							}
-						</script> 
+						<input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="${pr.id }" pr-status="${pr.status }"> |
 						<a href='${pageContext.request.contextPath}/transaksi/purchase-request/detail/${pr.id}' class="btn-view-pr btn btn-info" key-id="${pr.id }">View</a>
 					</td>
 				</tr>
@@ -173,6 +168,8 @@
 </body>
 <script>
 	$(function(){
+		var awal = '';
+		var akhir = '';
 		$('#pilih-tanggal-range').daterangepicker(
 		      {
 		        ranges   : {
@@ -184,10 +181,36 @@
 		          'Bulan lalu'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
 		        },
 		        startDate: moment().subtract(29, 'days'),
-		        endDate  : moment()
+		        endDate  : moment(),
 		      },
 		      function (start, end) {
-		        $('#pilih-tanggal-range').html(start.format('D MMMM, YYYY') + ' - ' + end.format('D MMMM, YYYY'))
+		        $('#pilih-tanggal-range').html(start.format('D MMMM YYYY') + ' - ' + end.format('D MMMM YYYY'))
+		        awal = start.format('YYYY-MM-DD');
+		        akhir = end.format('YYYY-MM-DD');
+		        $.ajax({
+					type : 'GET',
+					url : '${pageContext.request.contextPath}/transaksi/purchase-request/search-date?awal='+awal+'&akhir='+akhir,
+					success : function(data){
+						$('#isi-data-pr').empty();
+						$(data).each(function(key, val){
+							var json_data = '/Date('+val.createdOn+')/';
+							var asAMoment = moment(json_data);
+							var tanggal = asAMoment.format('DD-MM-YYYY HH:mm:ss');
+							
+							$('#isi-data-pr').append('<tr><td>'+tanggal+'</td>'
+								+'<td>'+val.prNo+'</td>'
+								+'<td>'+val.notes+'</td>'
+								+'<td>'+val.status+'</td>'
+								+'<td><input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="'+val.id+'" pr-status="'+val.status+'"> | '
+								+'<a href="${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+val.id+'" class="btn-view-pr btn btn-info" key-id="'+val.id+'">View</a></td>');
+						})
+						
+					},
+					error : function(){
+						console.log('gagal');
+						$('#isi-data-pr').empty();
+					}
+				});
 		      }
 	    );
 	    
@@ -208,7 +231,7 @@
 						}
 				};
 				prd.push(detail);
-				console.log(detail);
+		
 			});
 			
 			var tgl = $('#pilih-tanggal').val().split('/');
@@ -225,7 +248,7 @@
 				"status" : "Created",
 				"readyTime" : tanggal
 			};
-			console.log(purReq);
+			
 			//validate = $('#form-emp').parsley();
 			//validate.validate();
 			//if(validate.isValid()){
@@ -235,7 +258,7 @@
 					data : JSON.stringify(purReq),
 					contentType : 'application/json',
 					success : function() {
-						console.log('simpan');
+						
 						window.location = '${pageContext.request.contextPath}/transaksi/purchase-request';
 					},
 					error : function() {
@@ -274,8 +297,8 @@
 		$(".easy-autocomplete").removeAttr("style");
 		
 		// fungsi search
-	    $('#search-item').on('input',function(e){
-	    	console.log(itemsss);
+	    $('#search-item').on('keyup',function(e){
+	    	
 			var word = $(this).val();
 			if (word=="") {
 				$('#list-barang').empty();
@@ -285,7 +308,7 @@
 					url : '${pageContext.request.contextPath}/transaksi/purchase-request/search-item?search='+word,
 					dataType: 'json',
 					success : function(data){
-						console.log(data);
+						
 						$('#list-barang').empty();
 						$.each(data, function(key, val) {
 							$('#list-barang').append(
@@ -318,7 +341,7 @@
 					+'<td><button type="button" class="btn btn-danger btn-hapus-barang" id="btn-del'+id+'" key-id="'+id+'">&times;</button>'
 				);
 				added.push(variantId);
-				console.log(added);
+				
 			}else{
 				var target = $('#list-item > #'+variantId+'');
 				var oldReq = target.find('td').eq(2).text();
@@ -337,7 +360,7 @@
 		});
 		
 		$('#data-pr').on('click', '.btn-edit-pr', function(){
-			console.log('edit');
+			
 			added= [];
 			$('#list-item').empty();
 			var id = $(this).attr('key-id');
@@ -346,7 +369,7 @@
 				url : '${pageContext.request.contextPath}/transaksi/purchase-request/get-one/'+id,
 				dataType: 'json',
 				success : function(data){
-					console.log(data);
+					
 					$('#in-notes').val(data.notes);
 					$('#in-id').val(data.id);
 					var tgl = data.readyTime.split('-');
@@ -354,7 +377,7 @@
 					$('#pilih-tanggal').val(tanggal);
 					$(data.detail).each(function(key, val){
 						added.push(''+val.variant.id+'');
-						console.log(added);
+						
 						$('#list-item').append(
 							'<tr key-id="'+val.variant.id+'" id="'+val.variant.id+'"><td>'+val.variant.item.name+'-'+val.variant.name+'</td>'
 							+'<td id="td'+val.id+'"></td>'
@@ -378,49 +401,73 @@
 			});
 		});
 		
-		function demoFromHTML() {
-	        var pdf = new jsPDF('p', 'pt', 'letter');
-	        // source can be HTML-formatted string, or a reference
-	        // to an actual DOM element from which the text will be scraped.
-	        source = $('.content')[0];
-
-	        // we support special element handlers. Register them with jQuery-style 
-	        // ID selector for either ID or node name. ("#iAmID", "div", "span" etc.)
-	        // There is no support for any other type of selectors 
-	        // (class, of compound) at this time.
-	        specialElementHandlers = {
-	            // element with id of "bypass" - jQuery style selector
-	            '#bypassme': function (element, renderer) {
-	                // true = "handled elsewhere, bypass text extraction"
-	                return true
-	            }
-	        };
-	        margins = {
-	            top: 80,
-	            bottom: 60,
-	            left: 40,
-	            width: 522
-	        };
-	        // all coords and widths are in jsPDF instance's declared units
-	        // 'inches' in this case
-	        pdf.fromHTML(
-	        source, // HTML string or DOM elem ref.
-	        margins.left, // x coord
-	        margins.top, { // y coord
-	            'width': margins.width, // max width of content on PDF
-	            'elementHandlers': specialElementHandlers
-	        },
-
-	        function (dispose) {
-	            // dispose: object with X, Y of the last line add to the PDF 
-	            //          this allow the insertion of new lines after html
-	            pdf.save('Test.pdf');
-	        }, margins);
-	    }
+		$('#pil-status').change(function(){
+			var status = $(this).val();
+			var ur = '';
+			if(status == 'All'){
+				ut = '${pageContext.request.contextPath}/transaksi/purchase-request/get-all';
+			}else{
+				ur = '${pageContext.request.contextPath}/transaksi/purchase-request/search-status?search='+status;
+				$.ajax({
+					type : 'GET',
+					url : ur,
+					success : function(data){
+						
+						$('#isi-data-pr').empty();
+						$(data).each(function(key, val){
+							var json_data = '/Date('+val.createdOn+')/';
+							var asAMoment = moment(json_data);
+							var tanggal = asAMoment.format('DD-MM-YYYY HH:mm:ss');
+							
+							$('#isi-data-pr').append('<tr><td>'+tanggal+'</td>'
+								+'<td>'+val.prNo+'</td>'
+								+'<td>'+val.notes+'</td>'
+								+'<td>'+val.status+'</td>'
+								+'<td><input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="'+val.id+'" pr-status="'+val.status+'"> | '
+								+'<a href="${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+val.id+'" class="btn-view-pr btn btn-info" key-id="'+val.id+'">View</a></td>');
+						})
+						
+					},
+					error : function(){
+						$('#isi-data-pr').empty();
+						console.log('gagal');
+					}
+				});
+			}
+		});
 		
-		$('#btn-export').on('click', function(){
-			demoFromHTML();
-		})
+		$('#cari-pr').on('keyup', function(){
+			var word = $(this).val();
+			if (word=="") {
+				$('#isi-data-pr').empty();
+			} else {
+				$.ajax({
+					type : 'GET',
+					url : '${pageContext.request.contextPath}/transaksi/purchase-request/search?search='+word,
+					success : function(data){
+						console.log(data);				
+						$('#isi-data-pr').empty();
+						$(data).each(function(key, val){
+							var json_data = '/Date('+val.createdOn+')/';
+							var asAMoment = moment(json_data);
+							var tanggal = asAMoment.format('DD-MM-YYYY HH:mm:ss');
+							
+							$('#isi-data-pr').append('<tr><td>'+tanggal+'</td>'
+								+'<td>'+val.prNo+'</td>'
+								+'<td>'+val.notes+'</td>'
+								+'<td>'+val.status+'</td>'
+								+'<td><input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="'+val.id+'" pr-status="'+val.status+'"> | '
+								+'<a href="${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+val.id+'" class="btn-view-pr btn btn-info" key-id="'+val.id+'">View</a></td>');
+						})
+						
+					},
+					error : function(){
+						$('#isi-data-pr').empty();
+						console.log('gagal');
+					}
+				});
+			}
+		});
 	});
 </script>
 </html>
