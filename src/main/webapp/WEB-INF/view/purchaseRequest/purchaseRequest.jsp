@@ -124,10 +124,12 @@
 	                
 				</div>
 				<div class="modal-footer">
+					<button type="button" class="btn btn-success" 
+						id="submit-pr">Submit</button>
 					<button type="button" class="btn btn-info" data-dismiss="modal"
-						id="batal-insert">Batal</button>
+						id="batal-insert">Cancel</button>
 					<button type="button" class="btn btn-primary" id="tblsimpan"
-						key="key">Simpan</button>
+						key="key">Save</button>
 				</div>
 			</div>
 		</div>
@@ -156,10 +158,8 @@
 					</table>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-info" data-dismiss="modal"
-						id="batal-insert">Cancel</button>
-					<button type="button" class="btn btn-danger" id="tblkonfdel"
-						key="key">Add</button>
+					<button type="button" class="btn btn-info" id="batalinsert">Cancel</button>
+					<button type="button" class="btn btn-primary" id="tblkonfadd">Add</button>
 				</div>
 			</div>
 		</div>
@@ -184,33 +184,11 @@
 		        endDate  : moment(),
 		      },
 		      function (start, end) {
-		        $('#pilih-tanggal-range').html(start.format('D MMMM YYYY') + ' - ' + end.format('D MMMM YYYY'))
+		        $('#pilih-tanggal-range').html(start.format('D MMMM YYYY') + ' - ' + end.format('D MMMM YYYY'));
 		        awal = start.format('YYYY-MM-DD');
 		        akhir = end.format('YYYY-MM-DD');
-		        $.ajax({
-					type : 'GET',
-					url : '${pageContext.request.contextPath}/transaksi/purchase-request/search-date?awal='+awal+'&akhir='+akhir,
-					success : function(data){
-						$('#isi-data-pr').empty();
-						$(data).each(function(key, val){
-							var json_data = '/Date('+val.createdOn+')/';
-							var asAMoment = moment(json_data);
-							var tanggal = asAMoment.format('DD-MM-YYYY HH:mm:ss');
-							
-							$('#isi-data-pr').append('<tr><td>'+tanggal+'</td>'
-								+'<td>'+val.prNo+'</td>'
-								+'<td>'+val.notes+'</td>'
-								+'<td>'+val.status+'</td>'
-								+'<td><input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="'+val.id+'" pr-status="'+val.status+'"> | '
-								+'<a href="${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+val.id+'" class="btn-view-pr btn btn-info" key-id="'+val.id+'">View</a></td>');
-						})
-						
-					},
-					error : function(){
-						console.log('gagal');
-						$('#isi-data-pr').empty();
-					}
-				});
+		        ur = '${pageContext.request.contextPath}/transaksi/purchase-request/search-date?awal='+awal+'&akhir='+akhir;
+		        search();
 		      }
 	    );
 	    
@@ -219,8 +197,22 @@
       		startDate : new Date(),
     	});
 	    
+	    var stat = '';
+	    
 	    $('#tblsimpan').on('click',function(evt) {
 			evt.preventDefault();
+			stat = 'Created';
+			simpan();
+		}); 
+	    
+	    $('#submit-pr').on('click', function(evt){
+	    	evt.preventDefault();
+	    	stat = 'Submitted';
+	    	simpan();
+	    });
+	    
+		//fungsi simpan
+		function simpan(){
 			var prd = [];
 			
 			$('#list-item > tr').each(function(index,data) {
@@ -245,7 +237,7 @@
 					"id" : $('#pil-outlet').val()
 				},
 				"detail" : prd,
-				"status" : "Created",
+				"status" : stat,
 				"readyTime" : tanggal
 			};
 			
@@ -266,10 +258,12 @@
 					}
 				});
 			//}
-		}); // end fungsi simpan
-	    
-		var added = [];
+		};
 		
+		
+		var added = [];
+		var addedEdit = [];
+		var lagiEdit = 0;
 		// auto complete
 		var itemsss = [];
 		var itemss = {
@@ -279,6 +273,9 @@
 		$('#search-item').easyAutocomplete(itemss);
 		
 		$('#btn-tambah-item').on('click', function(){
+			itemsss = [];
+			isiBarang = $('#list-item').html();
+			console.log(isiBarang);
 			$.ajax({
 				type : 'get',
 				url : '${pageContext.request.contextPath}/item/get-inventory',
@@ -359,9 +356,13 @@
 			}
 		});
 		
+		var isiBarang = '';
+		
 		$('#data-pr').on('click', '.btn-edit-pr', function(){
-			
+			var isiEdit = '';
 			added= [];
+			addedEdit = [];
+			lagiEdit = 1;
 			$('#list-item').empty();
 			var id = $(this).attr('key-id');
 			$.ajax({
@@ -377,13 +378,12 @@
 					$('#pilih-tanggal').val(tanggal);
 					$(data.detail).each(function(key, val){
 						added.push(''+val.variant.id+'');
-						
-						$('#list-item').append(
-							'<tr key-id="'+val.variant.id+'" id="'+val.variant.id+'"><td>'+val.variant.item.name+'-'+val.variant.name+'</td>'
-							+'<td id="td'+val.id+'"></td>'
-							+'<td>'+val.requestQty+'</td>'
-							+'<td><button type="button" class="btn btn-danger btn-hapus-barang" id="btn-del'+id+'" key-id="'+id+'">&times;</button>'
-						);
+						addedEdit = added;
+						isiEdit = '<tr key-id="'+val.variant.id+'" id="'+val.variant.id+'"><td>'+val.variant.item.name+'-'+val.variant.name+'</td>'
+						+'<td id="td'+val.id+'"></td>'
+						+'<td>'+val.requestQty+'</td>'
+						+'<td><button type="button" class="btn btn-danger btn-hapus-barang" id="btn-del'+id+'" key-id="'+id+'">&times;</button>';
+						$('#list-item').append(isiEdit);
 						$.ajax({
 							type : 'GET',
 							url : '${pageContext.request.contextPath}/transaksi/purchase-request/get-inventory?idPr='+id+'&idPrd='+val.id,
@@ -392,7 +392,23 @@
 								$('#td'+val.id).append(inv[0]);
 							}
 						});
-					})
+					});
+					
+					if(data.status=='Created'){
+						$('#tblsimpan').prop('disabled', false);
+						$('#submit-pr').prop('disabled', false);
+						$('#pilih-tanggal').prop('disabled', false);
+						$('#in-notes').prop('disabled', false);
+						$('.btn-hapus-barang').prop('disabled', false);
+						$('#btn-tambah-item').prop('disabled', false);
+					}else{
+						$('#tblsimpan').prop('disabled', true);
+						$('#submit-pr').prop('disabled', true);
+						$('#pilih-tanggal').prop('disabled', true);
+						$('#in-notes').prop('disabled', true);
+						$('.btn-hapus-barang').prop('disabled', true);
+						$('#btn-tambah-item').prop('disabled', true);
+					};
 					$('#create-pr').modal('show');
 				}, 
 				error : function(){
@@ -401,72 +417,84 @@
 			});
 		});
 		
+		var ur='';
+		
+		function search(){
+			$.ajax({
+				type : 'GET',
+				url : ur,
+				success : function(data){
+					$('#isi-data-pr').empty();
+					$(data).each(function(key, val){
+						var json_data = '/Date('+val.createdOn+')/';
+						var asAMoment = moment(json_data);
+						var tanggal = asAMoment.format('DD-MM-YYYY HH:mm:ss');
+						
+						$('#isi-data-pr').append('<tr><td>'+tanggal+'</td>'
+							+'<td>'+val.prNo+'</td>'
+							+'<td>'+val.notes+'</td>'
+							+'<td>'+val.status+'</td>'
+							+'<td><input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="'+val.id+'" pr-status="'+val.status+'"> | '
+							+'<a href="${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+val.id+'" class="btn-view-pr btn btn-info" key-id="'+val.id+'">View</a></td>');
+					})
+				},
+				error : function(){
+					$('#isi-data-pr').empty();
+					console.log('gagal');
+				}
+			});
+		}
+		
 		$('#pil-status').change(function(){
 			var status = $(this).val();
-			var ur = '';
 			if(status == 'All'){
-				ut = '${pageContext.request.contextPath}/transaksi/purchase-request/get-all';
+				ur = '${pageContext.request.contextPath}/transaksi/purchase-request/get-all';
+				search();
 			}else{
 				ur = '${pageContext.request.contextPath}/transaksi/purchase-request/search-status?search='+status;
-				$.ajax({
-					type : 'GET',
-					url : ur,
-					success : function(data){
-						
-						$('#isi-data-pr').empty();
-						$(data).each(function(key, val){
-							var json_data = '/Date('+val.createdOn+')/';
-							var asAMoment = moment(json_data);
-							var tanggal = asAMoment.format('DD-MM-YYYY HH:mm:ss');
-							
-							$('#isi-data-pr').append('<tr><td>'+tanggal+'</td>'
-								+'<td>'+val.prNo+'</td>'
-								+'<td>'+val.notes+'</td>'
-								+'<td>'+val.status+'</td>'
-								+'<td><input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="'+val.id+'" pr-status="'+val.status+'"> | '
-								+'<a href="${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+val.id+'" class="btn-view-pr btn btn-info" key-id="'+val.id+'">View</a></td>');
-						})
-						
-					},
-					error : function(){
-						$('#isi-data-pr').empty();
-						console.log('gagal');
-					}
-				});
+				search();
 			}
 		});
 		
 		$('#cari-pr').on('keyup', function(){
 			var word = $(this).val();
 			if (word=="") {
-				$('#isi-data-pr').empty();
+				ur = '${pageContext.request.contextPath}/transaksi/purchase-request/get-all';
+				search();
 			} else {
-				$.ajax({
-					type : 'GET',
-					url : '${pageContext.request.contextPath}/transaksi/purchase-request/search?search='+word,
-					success : function(data){
-						console.log(data);				
-						$('#isi-data-pr').empty();
-						$(data).each(function(key, val){
-							var json_data = '/Date('+val.createdOn+')/';
-							var asAMoment = moment(json_data);
-							var tanggal = asAMoment.format('DD-MM-YYYY HH:mm:ss');
-							
-							$('#isi-data-pr').append('<tr><td>'+tanggal+'</td>'
-								+'<td>'+val.prNo+'</td>'
-								+'<td>'+val.notes+'</td>'
-								+'<td>'+val.status+'</td>'
-								+'<td><input type="button" class="btn-edit-pr btn btn-default" value="Edit" key-id="'+val.id+'" pr-status="'+val.status+'"> | '
-								+'<a href="${pageContext.request.contextPath}/transaksi/purchase-request/detail/'+val.id+'" class="btn-view-pr btn btn-info" key-id="'+val.id+'">View</a></td>');
-						})
-						
-					},
-					error : function(){
-						$('#isi-data-pr').empty();
-						console.log('gagal');
-					}
-				});
+				ur = '${pageContext.request.contextPath}/transaksi/purchase-request/search?search='+word;
+				search();
 			}
+		});
+		
+		$('#btn-create').on('click', function(){
+			$('#tblsimpan').prop('disabled', false);
+			$('#submit-pr').prop('disabled', false);
+			$('#pilih-tanggal').prop('disabled', false);
+			$('#in-notes').prop('disabled', false);
+			$('.btn-hapus-barang').prop('disabled', false);
+			$('#btn-tambah-item').prop('disabled', false);
+			$('#pilih-tanggal').val('');
+			$('#in-notes').val('');
+			$('#list-item').empty();
+			isiEdit='';
+			added = [];
+			addedEdit = [];
+			lagiEdit = 0;
+		});
+		
+		$('#batalinsert').on('click', function(){
+			console.log('clicked');
+			$('#list-item').empty();
+			added = [];
+			if(lagiEdit == 1){
+				added = addedEdit;
+			}
+			$('#list-item').append(isiBarang);
+		});
+		
+		$('#tblkonfadd').on('click', function(){
+			$('#add-item-pr').modal('hide');
 		});
 	});
 </script>
