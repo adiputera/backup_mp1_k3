@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.xsis.batch137.model.Adjustment;
+import com.xsis.batch137.model.AdjustmentHistory;
 import com.xsis.batch137.model.ItemInventory;
 import com.xsis.batch137.model.Outlet;
 import com.xsis.batch137.service.AdjustmentService;
-import com.xsis.batch137.service.ItemInventoryService;
 
 @Controller
-@RequestMapping("adjustment")
+@RequestMapping("transaksi/adjustment")
 public class AdjustmentController {
 
 	@Autowired
@@ -50,16 +50,17 @@ public class AdjustmentController {
 		adjustmentService.delete(id);
 	}
 	
-	@RequestMapping(value="/take", method=RequestMethod.GET)
-	@ResponseBody
-	public Adjustment getOne(@PathVariable long id) {
-		return adjustmentService.getOne(id);
+	@RequestMapping(value="/take/{id}", method=RequestMethod.GET)
+	public String getOne(@PathVariable long id, Model model) {
+		Adjustment adjustment = adjustmentService.getOne(id);
+		model.addAttribute("adjustment", adjustment);
+		return "/Adjustment/adjustment-detail";
 	}
 	
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
-	@ResponseStatus(HttpStatus.OK)
-	public void update(@RequestBody Adjustment adjustment) {
-		adjustmentService.update(adjustment);
+	@ResponseBody
+	public List<AdjustmentHistory> update(@RequestBody Adjustment adjustment) {
+		return adjustmentService.update(adjustment);
 	}
 	
 	@RequestMapping(value="/get-all-outlet", method=RequestMethod.GET)

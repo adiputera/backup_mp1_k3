@@ -104,6 +104,7 @@
 	<script src="${pageContext.request.contextPath}/resources/js/parsley.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/jspdf.min.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/easyAutoComplete-1.3.5/jquery.easy-autocomplete.min.js"></script>
+	
 <!-- page script -->
 
 </head>
@@ -313,7 +314,7 @@
 					<ul class="dropdown-menu">
 						<!-- User image -->
 						<li class="user-header"><img
-							src="${pageContext.request.contextPath}/resources//dist/img/user2-160x160.jpg"
+							src="${pageContext.request.contextPath}/resources/dist/img/user2-160x160.jpg"
 							class="img-circle" alt="User Image">
 
 							<p>
@@ -395,7 +396,7 @@
 	          <ul class="treeview-menu">
 	            <li><a href="${pageContext.request.contextPath}/transaksi/purchase-request"><i class="fa fa-circle-o"></i> Purchase Request</a></li>
 	            <li><a href="${pageContext.request.contextPath}/transaksi/purchase-order"><i class="fa fa-circle-o"></i> Purchase Order</a></li>
-	            <li><a href="${pageContext.request.contextPath}/transaksi/"><i class="fa fa-circle-o"></i> Outlet</a></li>
+	            <li><a href="${pageContext.request.contextPath}/transaksi/adjustment"><i class="fa fa-circle-o"></i> Adjustment</a></li>
 	            <li><a href="${pageContext.request.contextPath}/supplier"><i class="fa fa-circle-o"></i> Suppplier</a></li>
 	            <li><a href="${pageContext.request.contextPath}/item"><i class="fa fa-circle-o"></i> Item</a></li>
 	          </ul>

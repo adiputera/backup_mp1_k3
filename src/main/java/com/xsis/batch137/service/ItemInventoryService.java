@@ -37,6 +37,14 @@ public class ItemInventoryService {
 		itemInventoryDao.update(itemInventory);
 	}
 	
+	public void updateTransferStock(ItemInventory itemInventory) {
+		itemInventoryDao.updateTransferStock(itemInventory);
+	}
+	
+	public List<ItemInventory> searchInventoryByVariant(Long search){
+		return itemInventoryDao.searchInventoryByVariant(search);
+	};
+
 	
 	public void saveAtauUpdate(ItemInventory itemInventory) {
 		itemInventoryDao.saveAtauUpdate(itemInventory);
@@ -48,5 +56,17 @@ public class ItemInventoryService {
 
 	public List<ItemInventory> searchItemInventoryByItemName(String search) {
 		return itemInventoryDao.searchItemInventoryByItemName(search);
+	}
+	public List<ItemInventory> getItemInventoryByOutlet(Long search, Long id) {
+		// TODO Auto-generated method stub
+		return itemInventoryDao.getItemInvetoryByOutlet(search,id);
+	}
+	public List<ItemInventory> listInventoryByOutlet(Long search) {
+		// TODO Auto-generated method stub
+		return itemInventoryDao.listInventoryByOutlet(search);
+	}
+	public void updateSalesOrder(ItemInventory itemInventory) {
+		// TODO Auto-generated method stub
+		itemInventoryDao.updateSalesOrder(itemInventory);
 	}
 }

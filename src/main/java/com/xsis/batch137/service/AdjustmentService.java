@@ -43,28 +43,42 @@ public class AdjustmentService {
 		adjust.setOutlet(adjustment.getOutlet());
 		adjust.setStatus(adjustment.getStatus());
 		adjust.setNotes(adjustment.getNotes());
+		adjust.setStatus("Submitted");
 		adjust.setCreatedOn(new Date());
-		adjustmentDao.save(adjust);
+		adjustmentDao.save(adjust); //dapat id adjustment sepertinya dari sini
 		
-		/*for(AdjustmentDetail det : adjustment.getAdjustmentDetails()) {
+		for(AdjustmentDetail det : adjustment.getAdjustmentDetails()) {
 			AdjustmentDetail detail =  new AdjustmentDetail();
 			detail.setActualStock(det.getActualStock());
 			detail.setInStock(det.getInStock());
 			detail.setVariant(det.getVariant());
-			detail.setAdjustment(adjust);
+			detail.setCreatedOn(new Date());
+			detail.setAdjustment(adjust); //ternyata dia sudah punya id adjustment
+			
+		System.out.println("Detail Variant: "+detail.getVariant().getId());
+		System.out.println("Detail Adjustment: "+detail.getAdjustment().getId());
 			detailDao.save(detail);
-		}*/
+		}
 		
 		
-		/*AdjustmentHistory history = new AdjustmentHistory();
+		AdjustmentHistory history = new AdjustmentHistory();
 		history.setAdjustment(adjust);
-		history.setStatus(getStatus());
-		historyDao.save(history);*/
+		history.setCreatedOn(new Date());
+		history.setStatus(adjust.getStatus());
+		historyDao.save(history);
 			
 	}
 	
-	public void update(Adjustment adjustment) {
+	//Update di sini ketika done di Adjustment Detail
+	public List<AdjustmentHistory> update(Adjustment adjustment) {
+		adjustment.setModifiedOn(new Date());
 		adjustmentDao.update(adjustment);
+		AdjustmentHistory history = new AdjustmentHistory();
+		history.setAdjustment(adjustment);
+		history.setCreatedOn(new Date());
+		history.setStatus(adjustment.getStatus());
+		historyDao.save(history);
+		return historyDao.getHistoryByAdjustment(adjustment);
 	}
 	
 	public void delete(long id) {
@@ -78,7 +92,14 @@ public class AdjustmentService {
 	}
 	
 	public Adjustment getOne(long id) {
-		return adjustmentDao.getOne(id);
+		Adjustment adjustment = adjustmentDao.getOne(id);
+		List<AdjustmentDetail> details = detailDao.getDetailByAdjustment(adjustment);
+		List<AdjustmentHistory> histories = historyDao.getHistoryByAdjustment(adjustment);
+		adjustment.setAdjustmentDetails(details);
+		adjustment.setAdjustmentHistories(histories);
+		/*adjustment.getAdjustmentDetails();
+		adjustment.getAdjustmentHistories();*/
+		return adjustment;
 	}
 
 	public List<Outlet> getOutletForAdjustment() {

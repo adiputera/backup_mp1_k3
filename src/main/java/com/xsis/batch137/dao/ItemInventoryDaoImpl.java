@@ -90,5 +90,104 @@ public class ItemInventoryDaoImpl implements ItemInventoryDao {
 			return itemInventories;
 		}
 	}
-}
+
+	public void updateTransferStock(ItemInventory invent) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		ItemInventory ivt = session.get(ItemInventory.class, invent.getId());
+		//ItemInventory ivtX = session.get(ItemInventory.class,ivt.getItemVariant().getId());
+		//System.out.println(ivtX.getId());
+		int currentQty = ivt.getEndingQty()-invent.getTransferStockQty();
+		int transferStock = ivt.getTransferStockQty() + invent.getTransferStockQty();
+		Long toOutletId = invent.getOutlet().getId();
+		List<ItemInventory> ivtss = session.createCriteria(ItemInventory.class).list();
+		
+		int aa=0;
+		int currentQty2 = 0;
+		String hql = "update ItemInventory set transferStockQty = :invent, endingQty= :endingQty where id = :id";
+		session.createQuery(hql).setParameter("invent", transferStock).setParameter("endingQty", currentQty).setParameter("id", invent.getId()).executeUpdate();
+		
+		for(ItemInventory ivz : ivtss) {
+			if(ivz.getItemVariant().getId() == ivt.getItemVariant().getId() && ivz.getOutlet().getId() == invent.getOutlet().getId()) {
+				aa = 1;
+				currentQty2=ivz.getEndingQty()+invent.getTransferStockQty();
+				//System.out.println(aa);
+			}
+		}
+		
+		System.out.println(currentQty2);
+		
+		if (aa == 1) {
+			int currentQty2Fix = currentQty2 + invent.getTransferStockQty();
+			String hql2 = "update ItemInventory ivt set endingQty = :eQty where ivt.itemVariant.id = :id and outlet.id = :outId";
+			session.createQuery(hql2).setParameter("eQty", currentQty2).setParameter("id", ivt.getItemVariant().getId()).setParameter("outId", toOutletId).executeUpdate();
+		}
+		
+		else {
+			ItemInventory ivNoData = new ItemInventory();
+			ivNoData.setAlertAtQty(0);
+			ivNoData.setBeginning(invent.getTransferStockQty());
+			ivNoData.setEndingQty(invent.getTransferStockQty());
+			ivNoData.setItemVariant(ivt.getItemVariant());
+			ivNoData.setOutlet(invent.getOutlet());
+			ivNoData.setTransferStockQty(0);
+			session.save(ivNoData);
+			session.flush();
+		}	
+	}
+	
+	public List<ItemInventory> searchInventoryByVariant(Long search){
+		Session session=sessionFactory.getCurrentSession();
+		/*String hql="from ItemInventory itemInventory right outer join ItemVariant itemVariant on itemInventory.itemVariant.id=itemVariant.id "
+				+ "where itemVariant.item = :item" ;*/
+		String hql="from ItemInventory i where i.itemVariant.id = :search";
+		List<ItemInventory> itemInventories=session.createQuery(hql).setParameter("search", search).list();
+		if(itemInventories.isEmpty()) {
+			return null;
+		}
+		
+		return itemInventories;
+	}
+
+	@Override
+	public List<ItemInventory> getItemInvetoryByOutlet(Long search, Long id) {
+		Session session=sessionFactory.getCurrentSession();
+		/*String hql="from ItemInventory itemInventory right outer join ItemVariant itemVariant on itemInventory.itemVariant.id=itemVariant.id "
+				+ "where itemVariant.item = :item" ;*/
+		String hql="from ItemInventory i where i.itemVariant.item.id = :search and i.outlet.id= :outId";
+		List<ItemInventory> itemInventories=session.createQuery(hql).setParameter("search", search).setParameter("outId", id).list();
+		if(itemInventories.isEmpty()) {
+			return null;
+		}
+		
+		return itemInventories;
+	}
+
+	@Override
+	public List<ItemInventory> listInventoryByOutlet(Long search) {
+		Session session=sessionFactory.getCurrentSession();
+		/*String hql="from ItemInventory itemInventory right outer join ItemVariant itemVariant on itemInventory.itemVariant.id=itemVariant.id "
+				+ "where itemVariant.item = :item" ;*/
+		String hql="from ItemInventory i where i.outlet.id = :search";
+		List<ItemInventory> itemInventories=session.createQuery(hql).setParameter("search", search).list();
+		if(itemInventories.isEmpty()) {
+			return null;
+		}
+		
+		return itemInventories;
+	}
+
+	@Override
+	public void updateSalesOrder(ItemInventory itemInventory) {
+		Session session = sessionFactory.getCurrentSession();
+		ItemInventory invent = session.get(ItemInventory.class, itemInventory.getId());
+		int currentQty = invent.getEndingQty() - itemInventory.getSalesOrderQty();
+		System.out.println(currentQty);
+		String hql = "update ItemInventory ivt set endingQty = :endingQty where id = :id and ivt.outlet.id = :outId";
+		session.createQuery(hql).setParameter("endingQty", currentQty).setParameter("id", itemInventory.getId()).setParameter("outId",itemInventory.getOutlet().getId()).executeUpdate();
+		
+		}
+	}
+
+
 
