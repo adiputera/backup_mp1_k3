@@ -1,7 +1,10 @@
 package com.xsis.batch137.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +31,11 @@ public class EmployeeService {
 	@Autowired
 	UserDao uDao;
 	
+	@Autowired
+	HttpSession httpSession;
+	
 	public void save(Employee emp) {
+		User usrlogin = (User)httpSession.getAttribute("userLogin");
 		Employee employee = new Employee();
 		employee.setId(emp.getId());
 		employee.setFirstName(emp.getFirstName());
@@ -37,6 +44,8 @@ public class EmployeeService {
 		employee.setTitle(emp.getTitle());
 		employee.setActive(emp.isActive());
 		if(employee.getId()!=0) {
+			employee.setModifiedBy(usrlogin);
+			employee.setModifiedOn(new Date());
 			User usr = uDao.getUserByEmployee(employee);
 			if(usr == null) {
 				employee.setHaveAccount(false);
@@ -48,6 +57,8 @@ public class EmployeeService {
 			}
 		}else {
 			employee.setHaveAccount(emp.isHaveAccount());
+			employee.setCreatedOn(new Date());
+			employee.setCreatedBy(usrlogin);
 		}
 		empDao.save(employee);
 		
@@ -142,14 +153,18 @@ public class EmployeeService {
 	
 	public List<Outlet> getOutletByEmployee(Employee emp){
 		List<EmployeeOutlet> eos = eoDao.getEmployeeOutletByEmployee(emp);
-		List<Outlet> outlets = null;
-		if(eos!=null) {
+		List<Outlet> outlets = new ArrayList<>();
+		if(eos==null) {
+			return null;
+		}else {
 			for(EmployeeOutlet eo : eos) {
 				outlets.add(eo.getOutlet());
 			}
 			return outlets;
-		}else {
-			return null;
 		}
+	}
+	
+	public User getUserByEmployee(Employee emp) {
+		return uDao.getUserByEmployee(emp);
 	}
 }

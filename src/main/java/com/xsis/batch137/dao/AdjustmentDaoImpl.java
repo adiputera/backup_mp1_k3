@@ -1,5 +1,6 @@
 package com.xsis.batch137.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -26,12 +27,12 @@ public class AdjustmentDaoImpl implements AdjustmentDao{
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
 		if(adjustment.getStatus().equals("Rejected")) {
-			String hql = "update Adjustment set status = 'Rejected' where id = :id";
-			session.createQuery(hql).setParameter("id", adjustment.getId()).executeUpdate();
+			String hql = "update Adjustment set status = 'Rejected', modifiedOn = :date where id = :id";
+			session.createQuery(hql).setParameter("id", adjustment.getId()).setParameter("date", adjustment.getModifiedOn()).executeUpdate();
 		}
 		else {
-			String hql = "update Adjustment set status = 'Approved' where id = :id";
-			session.createQuery(hql).setParameter("id", adjustment.getId()).executeUpdate();
+			String hql = "update Adjustment set status = 'Approved', modifiedOn = :date where id = :id";
+			session.createQuery(hql).setParameter("id", adjustment.getId()).setParameter("date", adjustment.getModifiedOn()).executeUpdate();
 		}
 		System.out.println(adjustment.getStatus());
 		session.flush();
@@ -54,6 +55,20 @@ public class AdjustmentDaoImpl implements AdjustmentDao{
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
 		return session.get(Adjustment.class, id);
+	}
+
+	@Override
+	public List<Adjustment> searchAdjustmentByDate(Date startDate, Date endDate) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from Adjustment where createdOn >= :start AND createdOn <= :end";
+		List<Adjustment> adjustments = session.createQuery(hql).setParameter("start", startDate).setParameter("end", endDate).list();
+		if(adjustments.isEmpty()) {
+			return null;
+		}
+		else {
+			return adjustments;
+		}
 	}
 	
 	

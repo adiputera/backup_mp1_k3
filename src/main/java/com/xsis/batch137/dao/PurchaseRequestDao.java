@@ -3,6 +3,7 @@ package com.xsis.batch137.dao;
 import java.util.Date;
 import java.util.List;
 
+import com.xsis.batch137.model.Outlet;
 import com.xsis.batch137.model.PurchaseRequest;
 
 public interface PurchaseRequestDao {
@@ -34,5 +35,9 @@ public interface PurchaseRequestDao {
 	List<PurchaseRequest> searchPRByStatus(String search);
 	
 	int CountPrByPrNo(String prNo);
+	
+	List<PurchaseRequest> searchPRByOneDate(Date date);
+	
+	List<PurchaseRequest> searchPRByOutlet(Outlet outlet);
 	
 }

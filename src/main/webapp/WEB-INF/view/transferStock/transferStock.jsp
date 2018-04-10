@@ -1,13 +1,103 @@
 <%@ include file="/WEB-INF/view/masterPage/layout.jsp"%>
+<%@ include file="modal/create-data.jsp"%>
+<%@ include file="modal/add-transfer-item.jsp"%>
+<%@ include file="modal/view-transfer-stock-detail.jsp"%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>ITEM JSP</title>
+<div class="content">
+<section class="box content">
+	<h3>Transfer Stock</h3>
+	<hr style="border-color:black;">
+		<div>
+			<div style="float:left;margin-right:150px;">
+				<select style="width:200%" id="search-outlet-to">
+				<option value="kosong">Search Outlet</option>
+					<c:forEach var="out" items="${outlets}">
+							<c:set var = "outId" scope = "session" value = "${outletLogin.id}"/>
+						
+							<c:choose>
+    		  				<c:when test = "${out.id != outId}">
+       			  				<option value="${out.id}">${out.name}</option>
+     		 				</c:when>
+     		 				</c:choose>
+						
+						</c:forEach>
+				<option value="all">All Outlet</option>	
+				</select>
+			</div>
+			
+			<div align="right" style="float:left;margin-right:10px">
+				<button id="export" class="btn btn-primary btn-md">Export Transfer Stock Data</button>
+			</div>
+
+			<div align="right" style="float: left">
+				<button id="create-transfer-stock" class="btn btn-primary btn-md">Create Transfer Stock Data</button>
+			</div>
+
+
+		</div>
+
+		<div>
+			<table id="transfer-stock-list"
+				class="table table-striped table-bordered table-hover">
+				<thead>
+					<tr>
+						<th>Transfer Date</th>
+						<th>From Outlet</th>
+						<th>To Outlet</th>
+						<th>Status</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody id="isi-transfer-stock-list">
+					<c:forEach items="${transferStocks}" var="trstock">
+						<tr>
+							<%-- <td>${trstock.modifiedOn}</td> --%> 
+							<script>
+								var modifiedOn = Date.parse("${trstock.modifiedOn}");
+								var date = getDateFormat(modifiedOn);
+								
+								function getDateFormat(date) {
+									var d = new Date(Number(date)),
+									month = '' + (d.getMonth() + 1),
+									day = '' + d.getDate(),
+									year = d.getFullYear();
+									if (month.length < 2)
+									    month = '0' + month;
+									if (day.length < 2)
+									    day = '0' + day;
+									var date = new Date();
+									date.toLocaleDateString();
+									return [year, month, day].join('-');
+								};
+								
+								document.write("<td>"+date+"</td>");
+							</script>
+							
+							
+							<td>${trstock.fromOutlet.name}</td>
+							<td>${trstock.toOutlet.name}</td>
+							<td>${trstock.status}</td>
+							<td><a href="#" id="${trstock.id}"
+								class="view-transfer-stock-detail">view</a></td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</div>
+</section>
+</div>
+</body>
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		
+		
+		$('#transfer-stock-list').DataTable({
+			paging : true,
+			searching : false
+		});
+		
+		
 		var saved = [];
 		var savedQty = [];
 		var dataFromAddItem = [];
@@ -17,13 +107,13 @@
 		$('#create-transfer-stock').on('click',function(evt){
 			evt.preventDefault;
 			document.getElementById("btn-save-submit").disabled = true;
-			$('#modal-create-data').modal();
+			$('#modal-create-data').modal({backdrop: 'static', keyboard: false});
 		});
 		
 		//Add transfer item
 	 	$('#add-transfer-item').on('click',function(evt){
 			evt.preventDefault;
-			$('#modal-add-transfer-item').modal();
+			$('#modal-add-transfer-item').modal({backdrop: 'static', keyboard: false});
 			
 			document.getElementById("btn-save-transfer-item").disabled = true;
 		}); 
@@ -46,7 +136,7 @@
 				 					+'<td>'+val.item+'</td>'
 									+ '<td>'+val.inStock+'</td>'
 									+ '<td id="qty-'+val.id+'">'+val.transferQty+'</td>'
-									+ '<td>'+val.idVariant+'</td>'
+									+ '<td style="display : none">'+val.idVariant+'</td>'
 									+ '<td> <a href="#" id='+val.id +' class="delete-transfer-item">X</a> </td>'
 									+ '</tr>');
 							alreadyId.push(val.id);
@@ -141,33 +231,49 @@
 		$('body').on('click', 'a.btn-save-item', function(evt){
 			document.getElementById("btn-save-transfer-item").disabled = false;
 			var id = $(this).attr('id');
+			var transQty=parseInt($('.add-transfer-stock-qty'+id).val());
+			var stock = parseInt($('.in-stock'+id).text());
 			
-			var transQty=$('.add-transfer-stock-qty'+id).val();
+			validate=$('#form-add-transfer-item').parsley();
+			validate.validate();
 			
-			var fullData = {
-					id : id,
-					item : $('.item-name'+id).text(),
-					inStock : $('.in-stock'+id).text(),
-					transferQty : $('.add-transfer-stock-qty'+id).val(),
-					idVariant : $('.item-variant'+id).text()
+			if(validate.isValid()){
+				if(transQty > stock){
+					alert('not enough stock!');
+				}
+				
+				else if(transQty <= 0){
+					alert('cannot transfer the data');
+				}
+				
+				else{
+					
+					var fullData = {
+							id : id,
+							item : $('.item-name'+id).text(),
+							inStock : $('.in-stock'+id).text(),
+							transferQty : $('.add-transfer-stock-qty'+id).val(),
+							idVariant : $('.item-variant'+id).text()
+					}
+					
+				
+					dataFromAddItem.push(fullData);
+					
+					//console.log (dataFromAddItem);
+					//console.log(id);
+					evt.preventDefault();
+					/* $('#td-qty-'+id).html(transQty); */
+					saved.push(id);
+					savedQty.push(transQty);
+					//supaya gak bsa d edit lg
+		 			//console.log(saved)
+					//console.log(savedQty) 
+					$('#qty-'+id).html(transQty);
+					$(this).hide();
+					$('.add-transfer-saved'+id).show();
+					
+				}	
 			}
-			
-		
-			dataFromAddItem.push(fullData);
-			
-			//console.log (dataFromAddItem);
-			//console.log(id);
-			evt.preventDefault();
-			/* $('#td-qty-'+id).html(transQty); */
-			saved.push(id);
-			savedQty.push(transQty);
-			//supaya gak bsa d edit lg
- 			//console.log(saved)
-			//console.log(savedQty) 
-			$('#qty-'+id).html(transQty);
-			$(this).hide();
-			$('.add-transfer-saved'+id).show();
-
 		});
 		
 		
@@ -201,9 +307,9 @@
 						if(saved.indexOf(val.id.toString())==-1){
 							$('#isi-popup-transfer-stock').append('<tr><td class="item-name'+val.id+'">'+val.itemVariant.item.name+'-'+val.itemVariant.name+'</td>'
 									+ '<td class="in-stock'+val.id+'">'+val.endingQty+'</td>'
-									+ '<td id="qty-'+val.id+'"><input type="number" class="add-transfer-stock-qty'+ val.id +'" value="1" /></td>'
-									+ '<td class="item-variant'+val.id+'">'+val.itemVariant.id+'</td>'
-									+ '<td> <a href="#" id='+val.id +' class="save-item'+val.id+' btn-save-item">SAVE</a> <a href="#" id='+val.id +' class="add-transfer-saved'+val.id+'">SAVED</a> </td>'
+									+ '<td id="qty-'+val.id+'"><input type="number" class="add-transfer-stock-qty'+ val.id +'" value="1" min="1" max="'+val.endingQty+'" data-parsley-required="true" required/></td>'
+									+ '<td style="display : none" class="item-variant'+val.id+'">'+val.itemVariant.id+'</td>'
+									+ '<td> <a href="#" id='+val.id +' class="save-item'+val.id+' btn-save-item"> &#10004; </a> <a href="#" id='+val.id +' class="add-transfer-saved'+val.id+'"> Added </a> </td>'
 									+ '</tr>');
 							$('.add-transfer-saved'+val.id).hide();
 						}
@@ -213,8 +319,8 @@
 							$('#isi-popup-transfer-stock').append('<tr><td>'+val.itemVariant.item.name+'-'+val.itemVariant.name+'</td>'
 									+ '<td>'+val.endingQty+'</td>'
 									+ '<td id="qty-'+val.id+'">'+savedQty[x]+'</td>'
-									+ '<td class="item-variant'+val.id+'">'+val.itemVariant.id+'</td>'
-									+ '<td> <a href="#" id='+val.id +' class="save-item'+val.id+' btn-save-item">SAVE</a> <a href="#" id='+val.id +' class="add-transfer-saved'+val.id+'">SAVED</a> </td>'
+									+ '<td style="display : none" class="item-variant'+val.id+'">'+val.itemVariant.id+'</td>'
+									+ '<td> <a href="#" id='+val.id +' class="save-item'+val.id+' btn-save-item">  &#10004; </a> <a href="#" id='+val.id +' class="add-transfer-saved'+val.id+'">Added</a> </td>'
 									+ '</tr>');
 							$('.save-item'+val.id).hide();
 						}
@@ -242,8 +348,8 @@
 					$('#hidden-from-outlet-id').val(data.fromOutlet.id);	
 					$('#hidden-outlet-id').val(data.toOutlet.id);
 					$('#hidden-id').val(data.id);
-					$('#created-by').val(data.createdBy);
-					$('#transfer-status').val(data.status);
+					$('#created-by').text("Created By : " + data.createdBy.username);
+					$('#transfer-status').text("Transfer Status : "+ data.status);
 					$('#notes').val(data.notes);
 				    $('#isi-transfer-stock-detail').empty();
 				    
@@ -259,28 +365,48 @@
 					}
 					
 					$('#more-option').html(option);
-
+					
+					//ajax for get transferstock-detail
+						$.ajax({
+					 		url : '${pageContext.request.contextPath }/transaction/transfer-stock/search-transfer-stock-history?search='+id,
+							type : 'GET',
+							dataType : 'json',
+								success : function(data){
+								$('#view-status-history').empty();
+								$.each(data, function(key, val) {
+								$('#view-status-history').append('<tr><td> On '+getDateFormat(val.createdOn)+' - '+val.status+'</td>'
+										+ '</tr>');
+								 		});
+									},
+									error : function(data){
+										alert('failed')
+									}
+					 			});
+					
+					
+ 
 					$.ajax({
 						url : '${pageContext.request.contextPath }/transaction/transfer-stock/search-transfer-stock-detail?search='+id,
 						type : 'GET',
 						dataType : 'json',
-						success : function(data){
-					 		$('#modal-view-transfer-stock-detail').modal();
+						success : function(data){ 
+					 		$('#modal-view-transfer-stock-detail').modal({backdrop: 'static', keyboard: false});
 					 		$.each(data, function(key, val) {
 					 		$('#isi-transfer-stock-detail').append('<tr><td>'+val.itemVariant.item.name+'-'+val.itemVariant.name+'</td>'
 						 			+ '<td>'+val.inStock+'</td>'
 									+ '<td>'+val.transferQty+'</td>'
-									+ '<td>'+val.itemVariant.id+'</td>'
-									+'<td>'+$('#hidden-outlet-id').val()+'</td>'
+									+ '<td style="display : none">'+val.itemVariant.id+'</td>'
+									+'<td style="display : none">'+$('#hidden-outlet-id').val()+'</td>'
 									+ '</tr>');
 					 		});
 					 		
-					 		var idz = []
+					 		var idz = [];
 					 		$('#data-transfer-stock-detail > tbody > tr').each(function(index,data){
 					 			var idx = {
 					 					id : $(data).find('td').eq(3).text(),
 					 					trStock : $(data).find('td').eq(2).text()
-					 			}
+					 			};
+					 			
 					 			idz.push(idx)
 					 		});
 					 		
@@ -329,59 +455,73 @@
 			console.log(transferStockId); */
 		 	 $.ajax({
 				url : '${pageContext.request.contextPath }/transaction/transfer-stock/update-status/'+transferStockId,
-				type : 'PUT',
+				type : 'PUT',	
 				data : JSON.stringify(newStatus),
 				contentType : 'application/json',
 				success : function(){
-					alert('update status successfully');
+					if(newStatus=="Rejected"){
+			    		window.location = '${pageContext.request.contextPath}/transaction/transfer-stock';	
+					}
 				}, error : function(){
 					alert('update status failed');
 				}
-			})   
+			});  
 		
 			if(newStatus=="Approved"){
 				
-				 $('#data-hidden-inventory > tbody > tr').each(function(index,data){
-					var updateTrstock = {
-						id: $(data).find('td').eq(0).text(),
-						transferStockQty : $(data).find('td').eq(1).text(),
-						 outlet : {
-							 id : $('#hidden-outlet-id').val() //transferTo
-						}
-					}
-				console.log(updateTrstock)
+				$.ajax({
+				url : '${pageContext.request.contextPath }/transaction/transfer-stock/update-inventory-data?search='+transferStockId,
+				type : 'GET',
+				data : JSON.stringify(newStatus),
+				contentType : 'application/json',
+				success : function(){
+		    		window.location = '${pageContext.request.contextPath}/transaction/transfer-stock';	
+				}, error : function(){
+					alert('update status failed');
+				}
+			}); 
 				
-				var outId = parseInt($(data).find('td').eq(2).text());
-				var fromId = parseInt($('#hidden-from-outlet-id').val());
 				
-				console.log(outId);
-				console.log ('z');		
-				console.log(fromId);
 				
-				if(outId == fromId){
-					 	$.ajax({
-							url : '${pageContext.request.contextPath}/item/update-inventory',
-							type : 'PUT',
-							data : JSON.stringify(updateTrstock),
-							contentType : 'application/json',
-							success : function(){
-								alert('update to inventory');
-							}, error : function(){
-								alert('update inventory failed');
+				
+	/* 				 /* $('#data-hidden-inventory > tbody > tr').each(function(index,data){
+						var updateTrstock = {
+							id: $(data).find('td').eq(0).text(),
+							transferStockQty : $(data).find('td').eq(1).text(),
+							 outlet : {
+								 id : $('#hidden-outlet-id').val() //transferTo
 							}
-						
-						}) 
-					}
+						}
+					console.log(updateTrstock)
+					
+					var outId = parseInt($(data).find('td').eq(2).text());
+					var fromId = parseInt($('#hidden-from-outlet-id').val());
+					
+					console.log(outId);
+					console.log ('z');		
+					console.log(fromId);
+					
+					if(outId == fromId){
+						 	$.ajax({
+								url : '${pageContext.request.contextPath}/item/update-inventory',
+								type : 'PUT',
+								data : JSON.stringify(updateTrstock),
+								contentType : 'application/json',
+								success : function(){
+									alert('update to inventory');
+								}, error : function(){
+									alert('update inventory failed');
+								}
+							
+							}) 
+						}
+					
+					 }); //data-hidden.each
+					  */
 				
-				 }); //data-hidden.each
 				 
-				
-				 
-			}
+			} 
 		
-		 
-		 
-			
 		} else if (newStatus=="Print") {
 			//window.locationd='${pageContext.request.contextPath}/transaction/transfer-stock/detail';
 		}	
@@ -399,71 +539,29 @@
 				window.location = "${pageContext.request.contextPath}/transaction/transfer-stock/search-outlet?search="+keyword;
 		  }
 	  });
+	 
+	 //function date format
+
+		function getDateFormat(date) {
+			var d = new Date(Number(date)),
+			month = '' + (d.getMonth() + 1),
+			day = '' + d.getDate(),
+			year = d.getFullYear();
+			if (month.length < 2)
+			    month = '0' + month;
+			if (day.length < 2)
+			    day = '0' + day;
+			var date = new Date();
+			date.toLocaleDateString();
+			return [year, month, day].join('-');
+		};
+		
+		$('#export').click(function(){
+			window.location = '${pageContext.request.contextPath}/generate/ts'; 
+		})
 	 	
 	 	
 	});
 </script>
 
-</head>
-<body>
-
-	<div>TRANSFER STOCK</div>
-	<br />
-	<div class="container">
-		<div>
-			<div style="float: left; margin-right: 600px;">
-				<select id="search-outlet-to">
-				<option value="kosong">Search Outlet</option>
-					<c:forEach var="out" items="${outlets}">
-						<option value="${out.id}">${out.name}</option>
-					</c:forEach>
-				<option value="all">All Outlet</option>	
-				</select>
-			</div>
-			
-			<div align="right" style="float: left; margin-right: 30px;">
-				<button id="export" class="btn btn-primary btn-md">Export</button>
-			</div>
-
-			<div align="right" style="float: left">
-				<button id="create-transfer-stock" class="btn btn-primary btn-md">Create</button>
-			</div>
-
-
-		</div>
-
-		<div>
-			<table id="transfer-stock-list"
-				class="table table-striped table-bordered table-hover">
-				<thead>
-					<tr>
-						<th>Transfer Date</th>
-						<th>From Outlet</th>
-						<th>To Outlet</th>
-						<th>Status</th>
-						<th>#</th>
-					</tr>
-				</thead>
-				<tbody id="isi-transfer-stock-list">
-					<c:forEach items="${transferStocks}" var="trstock">
-						<tr>
-							<td>${trstock.modifiedOn}</td>
-							<td>${trstock.fromOutlet.name}</td>
-							<td>${trstock.toOutlet.name}</td>
-							<td>${trstock.status}</td>
-							<td><a href="#" id="${trstock.id}"
-								class="view-transfer-stock-detail">view</a></td>
-						</tr>
-					</c:forEach>
-				</tbody>
-			</table>
-		</div>
-		
-		<%@ include file="modal/create-data.jsp"%>
-		<%@ include file="modal/add-transfer-item.jsp"%>
-		<%@ include file="modal/view-transfer-stock-detail.jsp"%>
-	
-	</div>
-
-</body>
 </html>

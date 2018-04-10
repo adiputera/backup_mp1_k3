@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import com.xsis.batch137.model.District;
 import com.xsis.batch137.model.Outlet;
 import com.xsis.batch137.model.Province;
 import com.xsis.batch137.model.Region;
+import com.xsis.batch137.model.User;
 
 @Service
 @Transactional
@@ -33,14 +36,31 @@ public class OutletService {
 	@Autowired
 	DistrictDao districtDao;
 	
+	@Autowired
+	HttpSession httpSession;
+	
 	public void save(Outlet outlet) {
+		User userLogin = (User) httpSession.getAttribute("userLogin");
+		outlet.setCreatedBy(userLogin);
 		outlet.setCreatedOn(new Date());
+		outlet.setActive(true);
 		outletDao.save(outlet);
 	}
 	
 	public void update(Outlet outlet) {
-		outlet.setModifiedOn(new Date());
-		outletDao.update(outlet);
+		User userLogin = (User) httpSession.getAttribute("userLogin");
+		Outlet out = outletDao.getOne(outlet.getId());
+		out.setAddress(outlet.getAddress());
+		out.setDistrict(outlet.getDistrict());
+		out.setEmail(outlet.getEmail());
+		out.setModifiedOn(new Date());
+		out.setName(outlet.getName());
+		out.setPhone(outlet.getPhone());
+		out.setProvince(outlet.getProvince());
+		out.setRegion(outlet.getRegion());
+		out.setPostalCode(outlet.getPostalCode());
+		out.setModifiedBy(userLogin);
+		outletDao.update(out);
 	}
 	
 	public void delete(long id) {

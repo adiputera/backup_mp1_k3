@@ -6,31 +6,30 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Transfer Stock</h5>
+				<h5 align="center" class="modal-title" id="exampleModalLabel">Transfer Stock</h5>
 			</div>
 			<div class="modal-body">
-				<form class="form-all">
+				<form class="form-all" style="border:none">
 						        			
 					<div class="form-group">
-						<p>CREATE NEW TRANSFER STOCK FORM</p> 
+						<table>
+							<tr><td>Create New Transfer Stock From :</td> <td> <span style="font-weight:bold">&nbsp;${outletLogin.name}</span></td></tr>
+						</table>
+						<input style="display:none" id="add-transfer-from" value="${outletLogin.id}"/>
 					</div>
 					
-					
-						<div class="form-group">
-						<label for="input-region">From</label> <select
-							class=form-control id="add-transfer-from">
-							<c:forEach var="out" items="${outlets}">
-								<option value="${out.id}">${out.name}</option>
-							</c:forEach>
-						</select>
-					</div>
-					
-
 					<div class="form-group">
 						<label for="input-region">To</label> <select
 							class=form-control id="add-transfer-to">
 							<c:forEach var="out" items="${outlets}">
-								<option value="${out.id}">${out.name}</option>
+							<c:set var = "outId" scope = "session" value = "${outletLogin.id}"/>
+							
+							<c:choose>
+    		  				<c:when test = "${out.id != outId}">
+       			  				<option value="${out.id}">${out.name}</option>
+     		 				</c:when>
+     		 				</c:choose>
+						
 							</c:forEach>
 						</select>
 					</div>
@@ -50,8 +49,8 @@
 								<th>Item</th>
 								<th>In Stock</th>
 								<th>Trans. Qty</th>
-								<th>ID VARIANT</th>
-								<th>#</th>
+								<th style="display : none">ID VARIANT</th>
+								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody id="isi-popup-transfer">
@@ -76,7 +75,7 @@
 
 					<div class="modal-footer">
 						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-						<button type="submit" id="btn-save-submit" class="btn btn-primary">Save & Submit</button>
+						<button type="button" id="btn-save-submit" class="btn btn-primary">Save & Submit</button>
 					</div>
 				</form>
 			</div>

@@ -34,7 +34,7 @@ public class PurchaseOrderController {
 	
 	@RequestMapping
 	public String index(Model model) {
-		List<PurchaseOrder> pos = poService.selectAll();
+		List<PurchaseOrder> pos = poService.getByOutlet();
 		List<Supplier> sups = supService.selectAll();
 		model.addAttribute("pos", pos);
 		model.addAttribute("sups", sups);
@@ -100,5 +100,11 @@ public class PurchaseOrderController {
 	@ResponseBody
 	public List<PurchaseOrder> getByDate(@RequestParam(value="awal", defaultValue="") @DateTimeFormat(pattern="yyyy-MM-dd") Date awal, @RequestParam(value="akhir", defaultValue="") @DateTimeFormat(pattern="yyyy-MM-dd") Date akhir){
 		return poService.getPOByDate(awal, akhir);
+	}
+	
+	@RequestMapping("/search-one-date")
+	@ResponseBody
+	public List<PurchaseOrder> getByOneDate(@RequestParam(value="date", defaultValue="") @DateTimeFormat(pattern="yyyy-MM-dd") Date date){
+		return poService.getPOByOneDate(date);
 	}
 }

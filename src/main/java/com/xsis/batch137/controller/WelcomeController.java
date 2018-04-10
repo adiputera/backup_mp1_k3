@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.xsis.batch137.model.Employee;
 import com.xsis.batch137.model.Outlet;
+import com.xsis.batch137.model.User;
 import com.xsis.batch137.service.EmployeeService;
 import com.xsis.batch137.service.OutletService;
 
@@ -40,9 +41,16 @@ public class WelcomeController {
 	public String chooseOutlet(Model model, Principal principal) {
 		String username = principal.getName();
 		Employee emp = employeeService.getEmployeeByUsername(username);
-		httpSession.setAttribute("username", username);
-		httpSession.setAttribute("employee", emp);
-		List<Outlet> outlets = employeeService.getOutletByEmployee(emp);
+		User user = employeeService.getUserByEmployee(emp);
+		httpSession.setAttribute("usernameLogin", username);
+		httpSession.setAttribute("empLogin", emp);
+		httpSession.setAttribute("userLogin", user);
+		List<Outlet> outlets = null;
+		if(user.getRole().getName().equals("ROLE_SUPER")) {
+			outlets = outletService.selectActive();
+		}else {
+			outlets = employeeService.getOutletByEmployee(emp); 
+		}
 		model.addAttribute("outlets", outlets);
 		return "choose-outlet";
 	}
@@ -50,7 +58,7 @@ public class WelcomeController {
 	@RequestMapping(value="/home")
 	public String home(@RequestParam(value="id", defaultValue="") long id) {
 		Outlet outlet =  outletService.getOne(id);
-		httpSession.setAttribute("outlet", outlet);
+		httpSession.setAttribute("outletLogin", outlet);
 		return "main";
 	}
 }

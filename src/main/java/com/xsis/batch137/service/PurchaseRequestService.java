@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +19,14 @@ import com.xsis.batch137.dao.PurchaseRequestDao;
 import com.xsis.batch137.dao.PurchaseRequestDetailDao;
 import com.xsis.batch137.dao.PurchaseRequestHistoryDao;
 import com.xsis.batch137.model.ItemInventory;
+import com.xsis.batch137.model.Outlet;
 import com.xsis.batch137.model.PurchaseOrder;
 import com.xsis.batch137.model.PurchaseOrderDetail;
 import com.xsis.batch137.model.PurchaseOrderHistory;
 import com.xsis.batch137.model.PurchaseRequest;
 import com.xsis.batch137.model.PurchaseRequestDetail;
 import com.xsis.batch137.model.PurchaseRequestHistory;
+import com.xsis.batch137.model.User;
 
 @Service
 @Transactional
@@ -49,7 +53,12 @@ public class PurchaseRequestService {
 	@Autowired
 	ItemInventoryDao iDao;
 	
+	@Autowired
+	HttpSession httpSession;
+	
 	public void save(PurchaseRequest pr) {
+		User user = (User)httpSession.getAttribute("userLogin");
+		
 		PurchaseRequest pureq = new PurchaseRequest();
 		pureq.setId(pr.getId());
 		pureq.setOutlet(pr.getOutlet());
@@ -102,10 +111,13 @@ public class PurchaseRequestService {
 			pureq.setModifiedOn(new Date());
 			PurchaseRequest pure = prDao.getOne(pureq.getId());
 			pureq.setCreatedOn(pure.getCreatedOn());
+			pureq.setCreatedBy(pure.getCreatedBy());
 			pureq.setPrNo(pure.getPrNo());
+			pureq.setModifiedBy(user);
 		}else {
 			pureq.setCreatedOn(new Date());
 			pureq.setPrNo(prNo);
+			pureq.setCreatedBy(user);
 		}
 		
 		prDao.save(pureq);
@@ -128,18 +140,20 @@ public class PurchaseRequestService {
 				puReqDet.setPurchaseReq(pureq);
 				puReqDet.setVariant(prd.getVariant());
 				puReqDet.setRequestQty(prd.getRequestQty());
-				puReqDet.setCreatedOn(pureq.getCreatedOn());
+				puReqDet.setCreatedBy(pureq.getCreatedBy());
+				puReqDet.setModifiedBy(pureq.getModifiedBy());
 				prdDao.save(puReqDet);
 			}
 		}
 		
-		if(pr.getId() != 0 && pr.getStatus()=="created") {
+		if(pr.getId() != 0 && pr.getStatus().equals("Created")) {
 			
 		}else {
 			PurchaseRequestHistory prh = new PurchaseRequestHistory();
 			prh.setPurchaseReq(pureq);
 			prh.setStatus(pureq.getStatus());
 			prh.setCreatedOn(pureq.getCreatedOn());
+			prh.setCreatedBy(user);
 			prhDao.save(prh);
 		}
 		
@@ -147,7 +161,7 @@ public class PurchaseRequestService {
 	
 	public List<PurchaseRequest> selectAll(){
 		List<PurchaseRequest> prs = prDao.selectAll();
-		if(prs.isEmpty()) {
+		if(prs == null) {
 			return null;
 		}else {
 			for(PurchaseRequest pr : prs) {
@@ -162,18 +176,36 @@ public class PurchaseRequestService {
 		}
 		 
 	}
+	
+	public List<PurchaseRequest> selectByOutlet(){
+		Outlet outlet = (Outlet) httpSession.getAttribute("outletLogin");
+		List<PurchaseRequest> prs = prDao.searchPRByOutlet(outlet);
+		if(prs == null) {
+			return null;
+		}else {
+			for(PurchaseRequest pr : prs) {
+				List<PurchaseRequestDetail> prds = prdDao.selectDetailByPr(pr);
+				if(prds == null) {
+					
+				}else {
+					pr.setDetail(prds);
+				}
+			}
+			return prs;
+		}
+	}
 
 	public PurchaseRequest getOne(long id) {
 		// TODO Auto-generated method stub
 		PurchaseRequest pr = prDao.getOne(id);
 		List<PurchaseRequestDetail> prds = prdDao.selectDetailByPr(pr);
 		List<PurchaseRequestHistory> prhs = prhDao.selectByPR(pr);
-		if(prds.isEmpty()) {
+		if(prds == null ) {
 			
 		}else {
 			pr.setDetail(prds);
 		}
-		if(prhs.isEmpty()) {
+		if(prhs == null) {
 			
 		}else {
 			pr.setHistory(prhs);
@@ -182,32 +214,37 @@ public class PurchaseRequestService {
 	}
 	
 	public void approve(long id) {
+		User user = (User)httpSession.getAttribute("userLogin");
 		prDao.approve(id);
 		PurchaseRequest pr = prDao.getOne(id);
 		PurchaseRequestHistory prh = new PurchaseRequestHistory();
 		prh.setCreatedOn(new Date());
 		prh.setPurchaseReq(pr);
 		prh.setStatus(pr.getStatus());
+		prh.setCreatedBy(user);
 		prhDao.save(prh);
 	}
 	
 	public void reject(long id) {
+		User user = (User)httpSession.getAttribute("userLogin");
 		prDao.reject(id);
 		PurchaseRequest pr = prDao.getOne(id);
 		PurchaseRequestHistory prh = new PurchaseRequestHistory();
 		prh.setCreatedOn(new Date());
 		prh.setPurchaseReq(pr);
 		prh.setStatus(pr.getStatus());
+		prh.setCreatedBy(user);
 		prhDao.save(prh);
 	}
 	
 	public void createPo(long id) {
 		prDao.createPo(id);
+		User user = (User)httpSession.getAttribute("userLogin");
 		PurchaseRequest pr = prDao.getOne(id);
 		
 		List<PurchaseRequestDetail> prds = prdDao.selectDetailByPr(pr);
 		
-		if(prds.isEmpty()) {
+		if(prds == null) {
 			
 		}else {
 			pr.setDetail(prds);
@@ -217,6 +254,7 @@ public class PurchaseRequestService {
 		prh.setCreatedOn(new Date());
 		prh.setPurchaseReq(pr);
 		prh.setStatus(pr.getStatus());
+		prh.setCreatedBy(user);
 		prhDao.save(prh);
 		
 		Calendar cal = Calendar.getInstance();
@@ -248,6 +286,7 @@ public class PurchaseRequestService {
 		po.setPurchaseReq(pr);
 		po.setStatus("Created");
 		po.setOutlet(pr.getOutlet());
+		po.setCreatedBy(user);
 		poDao.save(po);
 		if(pr.getDetail() == null) {
 			
@@ -255,6 +294,7 @@ public class PurchaseRequestService {
 			for(PurchaseRequestDetail prd : pr.getDetail()) {
 				PurchaseOrderDetail pod = new PurchaseOrderDetail();
 				pod.setCreatedOn(po.getCreatedOn());
+				pod.setCreatedBy(po.getCreatedBy());
 				pod.setPurchaseOrder(po);
 				pod.setRequestQty(prd.getRequestQty());
 				pod.setVariant(prd.getVariant());
@@ -264,6 +304,7 @@ public class PurchaseRequestService {
 		
 		PurchaseOrderHistory poh = new PurchaseOrderHistory();
 		poh.setCreatedOn(po.getCreatedOn());
+		poh.setCreatedBy(po.getCreatedBy());
 		poh.setPurchaseOrder(po);
 		poh.setStatus(po.getStatus());
 		pohDao.save(poh);
@@ -272,9 +313,7 @@ public class PurchaseRequestService {
 	public List<Object> getInventoryByVariantDanOutlet(long idPrd, long idPr){
 		PurchaseRequest pr = prDao.getOne(idPr);
 		PurchaseRequestDetail prd = prdDao.getOne(idPrd);
-		System.out.println(prd.getVariant().getId());
-		System.out.println(pr.getOutlet().getId());
-		return iDao.searchItemInventoryByItemVariantAndOutlet(prd.getVariant(), pr.getOutlet());
+		return iDao.getQtyByItemVariantAndOutlet(prd.getVariant(), pr.getOutlet());
 	}
 	
 	public List<PurchaseRequest> getPRByStatus(String status){
@@ -298,5 +337,9 @@ public class PurchaseRequestService {
 	
 	public List<PurchaseRequest> searchGlobal(String search){
 		return prDao.searchPR(search);
+	}
+	
+	public List<PurchaseRequest> getPRByOneDate(Date date){
+		return prDao.searchPRByOneDate(date);
 	}
 }

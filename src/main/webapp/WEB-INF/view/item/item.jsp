@@ -1,17 +1,90 @@
 <%@ include file="/WEB-INF/view/masterPage/layout.jsp"%>
+<%@ include file="modal/MAIN-Add-Data.jsp"%>
+<%@ include file="modal/MAIN-Edit-Data.jsp"%>
+<%@ include file="modal/VARIANT-Add-Data.jsp"%>
+<%@ include file="modal/VARIANT-Edit-Data.jsp"%>
+<%@ include file="modal/EDITITEM-VARIANT-Add-Data.jsp"%>
+<%@ include file="modal/EDITITEM-VARIANT-Edit-Data.jsp"%>
 
+<div class="content">
+<section class="box content">
+	<h3>Master Item</h3>
+	<hr style="border-color:black;"/>
+		<div style="display:none;float: left; margin-right: 600px;">
+				<p> Outlet Login : ${outletLogin.name} </p>
+				<input style="display:none" id="add-outlet" value="${outletLogin.id}"/>
+		</div>
+		
+		<div> 
+		<div style="float:left;margin-right:200px;">
+			<span><input class="form-control" style="width:200%" type="text" id="search-box" placeholder="Search Item"/></span>
+		</div>
+		
+		
+		<div align="right" style="float:left;margin-right:30px;">
+			<button id="export" class="btn btn-primary btn-md" >Export Item Data</button>
+		</div>	
+		
+		<div align="right" style="float:left">
+			<button  id="create-data-utama" class="btn btn-primary btn-md">Create Item Data</button>
+		</div>	
+		
+		</div>
+		
+		<div style="clear:both"></div>
+		<br/>
+		
+	<div id="daftar-barang">
+		<table id="dt-view-item" class="table table-striped table-bordered table-hover">
+		<thead>
+	
+			<tr>
+				<th>Name</th>
+				<th>Category</th>
+				<th>Unit Price</th>
+				<th>In Stock</th>
+				<th>Stock Alert</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody id="full-data-utama">
+			<c:forEach items="${itemInventories}" var="invent"> 
+			<c:set var = "endQty" scope = "session" value = "${invent.endingQty}"/>
+			<c:set var = "alertQty" scope = "session" value = "${invent.alertAtQty}"/>
+				<tr>
+					<td>${invent.itemVariant.item.name} - ${invent.itemVariant.name} </td>
+					<td>${invent.itemVariant.item.category.name}</td>
+					<td>Rp. ${invent.itemVariant.price}</td>
+					<td>${invent.endingQty}</td>
+					<td id="stock-alert">	
+					<c:choose>
+    		  				<c:when test = "${endQty <= alertQty}">
+       			  				<p>LOW<p>
+     		 				</c:when>
+     		
+     		 				<c:otherwise>
+       			  				<p>OK<p>
+     		 				</c:otherwise>
+     		 		</c:choose>
+					</td>
+					
+					<td><a href="#" id="${invent.itemVariant.item.id}" class="edit-data">Edit</a></td>
+				</tr>
+			</c:forEach> 
+		</tbody>	
+		</table>
+		</div>	
+</section>
+</div>
+</body>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>ITEM JSP</title>
 <script type="text/javascript">
-<%@ include file="/resources/js/parsley.js"%>
-</script>
-
-<script type="text/javascript">
-$(document).ready(function(){	
+$(document).ready(function(){
+	
+	$('#dt-view-item').DataTable({
+		searching : false,
+        "dom": 'rt<"bottom"flp><"clear">'
+	});
 	
 	var index=0;
 	
@@ -20,20 +93,26 @@ $(document).ready(function(){
 /* ============================== [SHOW MODAL] CREATE DATA UTAMA ======================================*/
 	$('#create-data-utama').on('click', function(evt) {
 		evt.preventDefault;
-		$('#modal-create-data').modal();
+		$('#modal-create-data').modal({backdrop: 'static', keyboard: false});
 	}); 
 /* ============================== [SHOW MODAL] FOR ADD VARIANT ======================================*/
     $('#btn-add-variant').on('click', function(evt) {
-    	evt.preventDefault();
-		$('#modal-add-variant').modal();
-		clearForm();
+    	
+		validate=$('#form-add-data').parsley();
+		validate.validate();
+		
+		if(validate.isValid()){
+			evt.preventDefault();
+			$('#modal-add-variant').modal({backdrop: 'static', keyboard: false});
+			clearForm();
+		}
 	});
     
     $('#edititem-btn-add-variant').on('click', function(evt) {
     	evt.preventDefault();
     	
     	var id = $(this).attr("data-id");
-		$('#edititem-modal-add-variant').modal();
+		$('#edititem-modal-add-variant').modal({backdrop: 'static', keyboard: false});
 		clearFormEdit();
 	});
    
@@ -50,7 +129,7 @@ $(document).ready(function(){
 						$('#add-unit-price').val()+'</p></td><td><p>'+$('#add-sku').val()
 						+'</p></td><td><p>'+$('#add-beginning-stock').val()+'</p></td><td style="display:none"><p>'+$('#add-alert-at').val()
 						+'</p></td> <td style="display:none"><p>'+$('#add-active-variant').val()+'</p></td>'
-						+'<td> <a href="#" id="tombol-edit-variant"> Edit </a> <a href="#" id="delete-variant-data"> X </a>'+'</td></tr>');
+						+'<td> <a href="#" id="tombol-edit-variant">Edit</a> | <a href="#" id="delete-variant-data" >Delete </a>'+'</td></tr>');
 			
 			 index++;
 			 console.log(index);
@@ -90,7 +169,7 @@ $(document).ready(function(){
 							$('#edit-unit-price').val()+'</p></td><td><p>'+$('#edit-sku').val()
 							+'</p></td><td><p>'+$('#edit-beginning-stock').val()+'</p></td><td style="display:none"><p>'+$('#edit-alert-at').val()
 							+'</p></td> <td style="display:none"><p>'+$('#edit-active-variant').val()+'</p></td>'
-							+'<td> <a href="#" id="tombol-edit-variant"> Edit </a> <a href="#" id="delete-variant-data"> X </a>'+'</td></tr>');	
+							+'<td> <a href="#" id="tombol-edit-variant"> Edit </a> | <a href="#" id="delete-variant-data"> Delete </a>'+'</td></tr>');	
 			}
 	 });
 	 
@@ -114,7 +193,7 @@ $(document).ready(function(){
 			    			+'</p></td><td style="display:none"><p>'+$('#edititem-edit-active-variant').val()+'</p></td>'
 			    			+'<td style="display:none"><p>'+$('#variant-id').val()+'</p></td>'
 			    			+'<td style="display:none"><p>'+$('#inventory-id').val()+'</p></td>'
-			    			+'<td> <a href="#" id="edititem-tombol-edit-variant"> Edit </a> <a href="#" id="edititem-delete-variant-data"> X </a>'+'</td></tr>');
+			    			+'<td> <a href="#" id="edititem-tombol-edit-variant"> Edit </a> | <a href="#" id="edititem-delete-variant-data"> Delete </a>'+'</td></tr>');
 			}
 			});
 			 
@@ -172,7 +251,7 @@ $(document).ready(function(){
 	        var select = element.find('td').eq(1).find('p').text();
 	        console.log(element)
 	        console.log(select)
-	        $('#modal-edit-variant').modal();
+	        $('#modal-edit-variant').modal({backdrop: 'static', keyboard: false});
 	        $('#edit-variant-name').val(element.find('td').eq(0).find('p').text());
 	        $('#edit-unit-price').val(element.find('td').eq(1).find('p').text());
 	        $('#edit-sku').val(element.find('td').eq(2).find('p').text());
@@ -186,7 +265,7 @@ $(document).ready(function(){
 	 $("#isi-popup-edit").on('click','#edititem-tombol-edit-variant',function(evt){
 		 evt.preventDefault();
 	        var element = $(this).parent().parent();
-	        $('#edititem-modal-edit-variant').modal();
+	        $('#edititem-modal-edit-variant').modal({backdrop: 'static', keyboard: false});
 	        $('#edititem-edit-variant-name').val(element.find('td').eq(0).find('p').text());
 	        $('#edititem-edit-unit-price').val(element.find('td').eq(1).find('p').text());
 	        $('#edititem-edit-sku').val(element.find('td').eq(2).find('p').text());
@@ -249,13 +328,13 @@ $(document).ready(function(){
 			
 			if(validate.isValid()){
 			    $.ajax({
-			    	url:'${pageContext.request.contextPath}/item/save',
+			    	url:'${pageContext.request.contextPath}/master/item/save',
 			    	type : 'POST',
 			    	data : JSON.stringify(item),
 			    	contentType : 'application/JSON',
 			    	success : function(){
 			    		alert('save success')
-			    		window.location = '${pageContext.request.contextPath}/item/';
+			    		window.location = '${pageContext.request.contextPath}/master/item/';
 			    	},
 			    	error : function(){
 			    		alert('save failed')
@@ -313,7 +392,7 @@ $(document).ready(function(){
 						 itemVar.push(itemVariant)
 					}); 
 				    
-				    console.log(itemVar)
+				    //console.log(itemVar)
 				    
 				    var item = {
 				    	id : $('#edit-item-input-id').val(),
@@ -325,17 +404,17 @@ $(document).ready(function(){
 				    	itemVariants : itemVar
 				    }
 				
-			    
+			    	console.log(item)
 				    if(item.name!==""){
 				    	//console.log(item.name)
 				    	 $.ajax({
-						    	url:'${pageContext.request.contextPath}/item/update',
+						    	url:'${pageContext.request.contextPath}/master/item/update',
 						    	type : 'PUT',
 						    	data : JSON.stringify(item),
 						    	contentType : 'application/JSON',
 						    	success : function(){
 						    		alert('save success')
-						    		window.location = '${pageContext.request.contextPath}/item/';
+						    		window.location = '${pageContext.request.contextPath}/master/item/';
 						    	},
 						    	error : function(){
 						    		alert('save failed')
@@ -346,11 +425,11 @@ $(document).ready(function(){
 				    
 				    idDelete.forEach(function(element){
 				    	$.ajax({
-							url : '${pageContext.request.contextPath}/item/delete-inventory/'+element,
+							url : '${pageContext.request.contextPath}/master/item/delete-inventory/'+element,
 							type:'DELETE',
 							success : function (){
 								//alert('delete successfully');
-								window.location = '${pageContext.request.contextPath}/item/';
+								window.location = '${pageContext.request.contextPath}/master/item/';
 							},
 							
 							error : function(){
@@ -362,12 +441,12 @@ $(document).ready(function(){
 				    
 				    idClear.forEach(function(element){
 				    	$.ajax({
-							url : '${pageContext.request.contextPath}/item/delete-inventory/'+element,
+							url : '${pageContext.request.contextPath}/master/item/delete-inventory/'+element,
 							type:'DELETE',
 							success : function (){
 								//alert('delete successfully');
 								alert('save successfully')
-								window.location = '${pageContext.request.contextPath}/item/';
+								window.location = '${pageContext.request.contextPath}/master/item/';
 							},
 							
 							error : function(){
@@ -390,11 +469,11 @@ $(document).ready(function(){
 	   
 	    	console.log(id)
 	    		$.ajax({
-				url :'${pageContext.request.contextPath}/item/search-inventory-outlet?search='+id+'&outlet-id='+outletId,
+				url :'${pageContext.request.contextPath}/master/item/search-inventory-outlet?search='+id+'&outlet-id='+outletId,
 				type :'GET',
 				dataType:'json',
 				success : function(xxx){	
-					$('#edit-itm').modal();
+					$('#edit-itm').modal({backdrop: 'static', keyboard: false});
 					$('#edit-item-input-id').val(parseInt(id));
 				 	var index = 0;
 					$.each(xxx,function(key,val){
@@ -408,7 +487,7 @@ $(document).ready(function(){
 								+'<td style="display:none"><p>'+val.itemVariant.id+'</p></td>'
 								+'<td style="display:none"><p>'+val.id+'</p></td>'
 								+'<td style="display:none"><p>'+val.outlet.id+'</p></td>'
-								+'<td> <a href="#" id="edititem-tombol-edit-variant" > Edit </a> <a href="#" id="edititem-delete-variant-data"> X </a>'
+								+'<td> <a href="#" id="edititem-tombol-edit-variant"> Edit </a> | <a href="#" id="edititem-delete-variant-data"> Delete </a>'
 								+'</tr>');
 						index++;
 					})
@@ -425,7 +504,7 @@ $(document).ready(function(){
 			$('#add-unit-price').val()+'</p></td><td><p>'+$('#add-sku').val()
 			+'</p></td><td><p>'+$('#add-beginning-stock').val()+'</p></td><td style="display:none"><p>'+$('#add-alert-at').val()
 			+'</p></td> <td style="display:none"><p>'+$('#add-active-variant').val()+'</p></td>'
-			+'<td> <a href="#" id="tombol-edit-variant"> Edit </a> <a href="#" id="delete-variant-data"> X </a>'+'</td></tr>');
+			+'<td> <a href="#" id="tombol-edit-variant" > Edit </a> | <a href="#" id="delete-variant-data">Delete </a>'+'</td></tr>');
 	}
     
     function reloadTableCreateEditVariant(){
@@ -433,7 +512,7 @@ $(document).ready(function(){
     			$('#edit-unit-price').val()+'</p></td><td><p>'+$('#edit-sku').val()
     			+'</p></td><td><p>'+$('#edit-beginning-stock').val()+'</p></td><td style="display:none"><p>'+$('#edit-alert-at').val()
     			+'</p></td> <td style="display:none"><p>'+$('#edit-active-variant').val()+'</p></td>'
-    			+'<td> <a href="#" id="tombol-edit-variant"> Edit </a> <a href="#" id="delete-variant-data"> X </a>'+'</td></tr>');
+    			+'<td> <a class="btn-warning" href="#" id="tombol-edit-variant"> Edit </a> | <a href="#" id="delete-variant-data">Delete </a>'+'</td></tr>');
     	}
     
     function reloadTableEdit(){
@@ -445,7 +524,7 @@ $(document).ready(function(){
    				+'<td style="display:none"><p>null</p></td>'
    				+'<td style="display:none"><p>null</p></td>'
    				+'<td style="display:none"><p>'+$('#outlet-id').val()+'</p></td>'
-    			+'<td><a href="#" id="edititem-tombol-edit-variant"> Edit </a> <a href="#" id="edititem-delete-variant-data"> X </a>'+'</td></tr>');
+    			+'<td><a href="#" id="edititem-tombol-edit-variant" class="btn-warning"> Edit </a> | <a href="#" id="edititem-delete-variant-data">&#10006; </a>'+'</td></tr>');
     }
    
 	function clearForm() {
@@ -466,13 +545,13 @@ $(document).ready(function(){
 	
 	function clearFormAddItem() {
 		$('#add-item-name').val('');
-		$('#add-category').val('');
+		//$('#add-category').val('');
 		$('#isi-popup-itm').empty();
 	}
 	
 	function clearFormEditItem() {
 		$('#edititem-item-name').val('');
-		$('#edititem-category').val('');
+		//$('#edititem-category').val('');
 		$('#isi-popup-edit').empty();
 	}
 	
@@ -484,7 +563,7 @@ $(document).ready(function(){
 		//console.log(keyword)
 		$.ajax({
 			type : 'GET',
-			url : '${pageContext.request.contextPath}/item/search-item?search='+keyword,
+			url : '${pageContext.request.contextPath}/master/item/search-item?search='+keyword,
 			dataType : 'json',
 			success : function (data){
 				$('#full-data-utama').empty();
@@ -506,107 +585,10 @@ $(document).ready(function(){
 		});
 	});  
 	
-	//data berdasarkan login
- 	  $('#outlet-login').change(function(evt){
-		  var keyword = $(this).val();
-		  if (keyword !== "kosong"){
-				window.location = "${pageContext.request.contextPath}/item/search-inventory?search="+keyword;
-		  }
-	  });
+ 	$('#export').click(function(){
+		window.location = '${pageContext.request.contextPath}/generate/item'; 
+	})
 	
-
 });
 </script>
-
-</head>
-<body>
-
-	<div>Items</div><br/>
-	<div class="container">
-	<div>
-		<div style="float: left; margin-right: 600px;">
-		<Label> Outlet Berdasarkan Login untuk create Data</Label>
-				<select id="add-outlet">
-					<c:forEach var="out" items="${outlets}">
-						<option value="${out.id}">${out.name}</option>
-					</c:forEach>
-				</select>
-			</div>
-			
-		<div style="float: left; margin-right: 600px;">
-		<Label> Outlet Search Data By Login</Label>
-				<select id="outlet-login">
-					<option value=kosong></option>
-					<c:forEach var="out" items="${outlets}">
-						<option value="${out.id}">${out.name}</option>
-					</c:forEach>
-				</select>
-			</div>
-			
-			
-		<div style="float:left;margin-right:600px;">
-			<span><input type="text" id="search-box" placeholder="Search"/></span>
-		</div>
-		
-		
-		<div align="right" style="float:left;margin-right:30px;">
-			<button id="export" class="btn btn-primary btn-md" >Export</button>
-		</div>	
-		
-		<div align="right" style="float:left">
-			<button id="create-data-utama" class="btn btn-primary btn-md">Create</button>
-		</div>	
-		
-	
-	</div>
-	
-	<div id="daftar-barang">
-		<table id="dt-view-item" class="table table-striped table-bordered table-hover">
-		<thead>
-	
-			<tr>
-				<th>Name</th>
-				<th>Category</th>
-				<th>Unit Price</th>
-				<th>In Stock</th>
-				<th>Stock Alert</th>
-				<th>#</th>
-			</tr>
-		</thead>
-		<tbody id="full-data-utama">
-			<c:forEach items="${itemInventories}" var="invent"> 
-			<c:set var = "endQty" scope = "session" value = "${invent.endingQty}"/>
-			<c:set var = "alertQty" scope = "session" value = "${invent.alertAtQty}"/>
-				<tr>
-					<td>${invent.itemVariant.item.name} - ${invent.itemVariant.name} </td>
-					<td>${invent.itemVariant.item.category.name}</td>
-					<td>${invent.itemVariant.price}</td>
-					<td>${invent.endingQty}</td>
-					<td id="stock-alert">	
-					<c:choose>
-    		  				<c:when test = "${endQty <= alertQty}">
-       			  				<p>LOW<p>
-     		 				</c:when>
-     		
-     		 				<c:otherwise>
-       			  				<p>OK<p>
-     		 				</c:otherwise>
-     		 		</c:choose>
-					</td>
-					
-					<td><a href="#" id="${invent.itemVariant.item.id}" class="edit-data">Edit</a></td>
-				</tr>
-			</c:forEach> 
-		</tbody>	
-		</table>
-		</div>	
-		<%@ include file="modal/MAIN-Add-Data.jsp"%>
-		<%@ include file="modal/MAIN-Edit-Data.jsp"%>
-		<%@ include file="modal/VARIANT-Add-Data.jsp"%>
-		<%@ include file="modal/VARIANT-Edit-Data.jsp"%>
-		<%@ include file="modal/EDITITEM-VARIANT-Add-Data.jsp"%>
-		<%@ include file="modal/EDITITEM-VARIANT-Edit-Data.jsp"%>
-	</div>
-
-</body>
 </html>

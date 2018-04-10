@@ -2,22 +2,48 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 
+<script>
+
+function readURL(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#blah')
+                .attr('src', e.target.result)
+                .width(150)
+                .height(200)	;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+	
+</script>
+
+<style>
+  article, aside, figure, footer, header, hgroup, 
+  menu, nav, section { display: block; }
+</style>
+
+
 <div class="modal fade" id="modal-create-data" tabindex="-1" role="dialog"
 	aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
+	 <div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Item</h5>
+				<h5 class="modal-title" id="exampleModalLabel" align="center">Create Item Data</h5>
 			</div>
 			<div class="modal-body">
-				<form id="form-add-data" class="form-all">
-						        			
+				<form style="border:none" id="form-add-data" class="form-all">
+					        			
 					<div class="form-group">
 						<label for="input-item-name">Item Name</label> <input type="text"
-							class="form-control" id="add-item-name" placeholder="enter item name" data-parsley-required="true" required>
+							class="form-control" id="add-item-name" placeholder="enter item name" data-required-message="Please insert your name"
+							data-parsley-required="true" required>
 					</div>
-
-					<div class="form-group">
+					
+					<div>
 						<label for="input-region">Category</label> <select
 							class=form-control id="add-category">
 							<c:forEach var="ctg" items="${categories}">
@@ -25,6 +51,8 @@
 							</c:forEach>
 						</select>
 					</div>
+					
+						<div style="clear: both	"></div>	
 
 					<div class="form-group" style="display:none" >
 						<label for="input-active">Active</label>
@@ -34,9 +62,8 @@
 						</form>
 					</div>
 					
-					<br/>
 					<div style="float:left"> 
-						<br/> <label for="input-active">VARIANT</label>	
+						<br/> <label for="input-active">Variant List</label>	
 					 </div>
 					 
 					 <div style="float:right"> 
@@ -51,7 +78,7 @@
 								<th>Beginning Stock</th>
 								<th style="display:none">Alert At</th>
 								<th style="display:none">Active</th>
-								<th>#</th>
+								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody id="isi-popup-itm">

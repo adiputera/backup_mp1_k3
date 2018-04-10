@@ -3,6 +3,8 @@ package com.xsis.batch137.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -20,9 +22,11 @@ import com.xsis.batch137.model.ItemInventory;
 import com.xsis.batch137.model.Outlet;
 import com.xsis.batch137.model.TransferStock;
 import com.xsis.batch137.model.TransferStockDetail;
+import com.xsis.batch137.model.TransferStockHistory;
 import com.xsis.batch137.service.ItemInventoryService;
 import com.xsis.batch137.service.OutletService;
 import com.xsis.batch137.service.TransferStockDetailService;
+import com.xsis.batch137.service.TransferStockHistoryService;
 import com.xsis.batch137.service.TransferStockService;
 
 @Controller
@@ -41,14 +45,24 @@ public class TransferStockController {
 	@Autowired
 	TransferStockDetailService transferStockDetailService;
 	
+	@Autowired
+	TransferStockHistoryService transferStockHistoryService;
+	
+	@Autowired
+	HttpSession httpSession;
+	
 	@RequestMapping
 	public String index(Model model) {
-		List<TransferStock> transferStocks=transferStockService.selectAll();
+		Outlet outlet = (Outlet) httpSession.getAttribute("outletLogin");
+		long outletId = outlet.getId();
+		System.out.println(outletId);
+		List<TransferStock> transferStocks=transferStockService.getTransferStockByOutletIdLogin(outletId);
 		List<Outlet> outlets = outletService.selectAll();
 		List<TransferStockDetail> transferStockDetails=transferStockDetailService.selectAll();
 		model.addAttribute("transferStockDetails",transferStockDetails);
 		model.addAttribute("transferStocks", transferStocks);
 		model.addAttribute("outlets", outlets);
+		model.addAttribute("outlet",outlet);
 		return "/transferStock/transferStock";
 	}
 	
@@ -97,6 +111,21 @@ public class TransferStockController {
 	public List<TransferStockDetail> searchTransferStockDetailByTransferStockId(@RequestParam(value="search",defaultValue="") Long search){
 		List<TransferStockDetail> transferStockDetails = transferStockDetailService.getTransferStockDetailByTransferStockId(search);
 		return transferStockDetails;
+	}
+	
+	@RequestMapping(value="/update-inventory-data",method=RequestMethod.GET)
+	@ResponseBody
+	public List<TransferStockDetail> updateInventoryData(@RequestParam(value="search",defaultValue="") Long search){
+		List<TransferStockDetail> transferStockDetails = transferStockDetailService.updateInventoryData(search);
+		return transferStockDetails;
+	}
+	
+	
+	@RequestMapping(value="/search-transfer-stock-history",method=RequestMethod.GET)
+	@ResponseBody
+	public List<TransferStockHistory> searchTransferStockHistoryByTransferStockId(@RequestParam(value="search",defaultValue="") Long search){
+		List<TransferStockHistory> transferStockHistory = transferStockHistoryService.getTransferStockHistoryByTransferStockId(search);
+		return transferStockHistory;
 	}
 	
 	@RequestMapping(value="/search-item-inventory",method=RequestMethod.GET)

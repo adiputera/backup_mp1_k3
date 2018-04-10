@@ -7,11 +7,30 @@
 		<h2>ADJUSTMENT DETAIL</h2>
 	</div>
 	<div class="col-xs-2" style="float:right; margin-right:50px; margin-top:25px">
-		<select class="form-control btn-info" id="status-adjustment">
-			<option disabled selected>MORE</option>
-			<option value="Approved">Approve</option>
-			<option value="Rejected">Reject</option>
-			<option value="Printed">Print</option>
+		<script type="text/javascript">
+			if('${adjustment.status}' == 'Submitted'){
+				document.write('<select class="form-control btn-info" id="status-adjustment">'
+					+ '<option disabled selected>MORE</option>'
+					+ '<option value="Approved">Approve</option>'
+					+ '<option value="Rejected">Reject</option>'
+					+ '<option value="Printed">Print</option>');
+			}
+			else if(('${adjustment.status}' == 'Rejected')  || ('${adjustment.status}' == 'Approved')){
+				document.write('<select class="form-control btn-info" id="status-adjustment">'
+					+ '<option disabled selected>MORE</option>'
+					+ '<option disabled value="Approved">Approve</option>'
+					+ '<option disabled value="Rejected">Reject</option>'
+					+ '<option value="Printed">Print</option>');
+			}
+			/* else if('${adjustment.status}' == 'Printed'){
+				document.write('<select class="form-control btn-info" id="status-adjustment">'
+					+ '<option disabled selected>MORE</option>'
+					+ '<option disabled value="Approved">Approve</option>'
+					+ '<option disabled value="Rejected">Reject</option>'
+					+ '<option value="Printed">Print</option>');
+			} */
+		</script>
+		
 		</select>
 	</div>
 </div>
@@ -22,7 +41,7 @@
 	<div class="row">
 		<div class="col-xs-2">Created By</div>
 		<div class="col-xs-1">:</div>
-		<div class="col-xs-3">[User]</div>
+		<div class="col-xs-3">${adjustment.createdBy.username }</div>
 	</div>
 	
 	<div class="row">
@@ -55,8 +74,8 @@
 		<div>On 
 		<script type="text/javascript">
 			var waktu = '${history.createdOn}';
-			var wkt = waktu.split('.');
-			document.write(wkt[0]);
+			var time = waktu.split('.');
+			document.write(time[0]);
 		</script>
 		 - ${history.status }</div>
 	</c:forEach>
@@ -113,10 +132,13 @@
 		$('#status-adjustment').change(function(e){
 			e.preventDefault();
 			var status = $(this).val();
-			if(status !== null){
+			if(status === 'Printed'){
+				window.print();
+			}
+			else{
 				var adjustment = {
 					id : $('#adjustment-id').val(),
-					status : status,
+					status : status
 				}
 				$.ajax({
 					url : '${pageContext.request.contextPath}/transaksi/adjustment/update',
@@ -136,6 +158,12 @@
 						});
 						$('#cetatus').empty();
 						$('#cetatus').append($('#status-adjustment').val());
+						$('#status-adjustment').empty();
+						$('#status-adjustment').append('<option disabled selected>MORE</option>'
+								+ '<option disabled value="Approved">Approve</option>'
+								+ '<option disabled value="Rejected">Reject</option>'
+								+ '<option value="Printed">Print</option>'
+								);
 						alert('Yeesss..');
 					},	
 					error : function(){
@@ -149,6 +177,7 @@
 		$('#done-adjustment').click(function(){
 			window.location = '${pageContext.request.contextPath}/transaksi/adjustment';
 		});
+		
 		
 	});
 </script>

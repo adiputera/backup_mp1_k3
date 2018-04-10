@@ -6,10 +6,10 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Add Transfer Item</h5>
+				<h5 align="center" class="modal-title" id="exampleModalLabel">Add Transfer Item</h5>
 			</div>
 			<div class="modal-body">
-				<form class="form-all">
+				<form class="form-all" id="form-add-transfer-item" style="border:none">
 				
 				<div>
 					<span><input class="form-control" type="text" id="search-item" placeholder="Search Item"/></span>
@@ -21,8 +21,8 @@
 								<th>Item</th>
 								<th>In Stock</th>
 								<th>Trans. Qty</th>
-								<th>ID VARIANT</th>
-								<th>#</th>
+								<th style="display : none">ID VARIANT</th>
+								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody id="isi-popup-transfer-stock">		

@@ -13,12 +13,12 @@ $(document).ready(function() {
 	
 	//Create customer
 	$('.customer').on('click', function() {
-		$('#choose-cust').modal();
+		$('#choose-cust').modal({backdrop: 'static', keyboard: false});
 	})
 	
 	//Add Customer
 	$('#add-new').on('click', function() {
-		$('#new-cust').modal();
+		$('#new-cust').modal({backdrop: 'static', keyboard: false});
 	})
 	
 	//save customer
@@ -66,7 +66,7 @@ $(document).ready(function() {
 		//console.log(id);
 		if (id!==""){
 			$.ajax({
-				url : '${pageContext.request.contextPath}/region/get-region?id='+id,
+				url : '${pageContext.request.contextPath}/master/region/get-region?id='+id,
 				type : 'GET',
 				success : function(regionss) {
 					var region = [];
@@ -89,19 +89,19 @@ $(document).ready(function() {
 	$('#prov-id').change(function(){
 		$('#reg-id').empty();
 		$('#dist-id').empty();
-		$('#reg-id').append('<option disabled selected value=\"\"> --- Select A Region --- </option>');
-		$('#dist-id').append('<option disabled selected value=\"\"> --- Select A District --- </option>');
+		$('#reg-id').append('<option disabled selected value=\"\">Select A Region</option>');
+		$('#dist-id').append('<option disabled selected value=\"\">Select A District</option>');
 		var id = $(this).val();
 		$.ajax({
 			
-			url : '${pageContext.request.contextPath}/outlet/get-region/'+id,
+			url : '${pageContext.request.contextPath}/master/outlet/get-region/'+id,
 			type : 'GET',
 			success : function(regions){
 				console.log(regions);
 				$(regions).each(function(index, data){
 					$('#reg-id').append('<option value=\"'+data.id+'\">'+data.name+'</option>');
 				});
-			},
+			},	
 			error : function(regions){
 				console.log(regions);
 				alert('Cannot take regions..');
@@ -112,10 +112,10 @@ $(document).ready(function() {
 	//Get District By Region
 	$('#reg-id').change(function(){
 		$('#dist-id').empty();
-		$('#dist-id').append('<option disabled selected value=\"\"> --- Select A District --- </option>');
+		$('#dist-id').append('<option disabled selected value=\"\">Select A District</option>');
 		var id = $(this).val();
 		$.ajax({
-			url : '${pageContext.request.contextPath}/outlet/get-district/'+id,
+			url : '${pageContext.request.contextPath}/master/outlet/get-district/'+id,
 			type : 'GET',
 			success : function(districts){
 				console.log(districts)
@@ -130,28 +130,47 @@ $(document).ready(function() {
 		});
 	});
 	
+	$('#pilih-tanggal').datepicker({
+   		autoclose: true,
+   		endDate : '-10y'
+ 	});
+	
 	//search customer
 	$('#name-cust').on('input',function(e){
 		var word = $(this).val();
-		console.log(word)
+		
 		if (word=="") {
-			$('#search-customer-tbl').empty();
+			$('#table-cust').empty();
 		} else {
 			$.ajax({
 				type : 'GET',
 				url : '${pageContext.request.contextPath}/transaction/sales-order/search-customer?search='+word,
 				dataType: 'json',
 				success : function(data){
-					$('#search-customer-tbl').empty();
-					$.each(data, function(key, val) {
+					$('#table-cust').empty();
+					
+					$('#table-cust').append('<table  id="table-customer" class="table table-stripped table-bordered table-hover">'
+							+'<thead>'
+							+	'<tr>'
+							+		'<th>Name</th>'
+							+		'<th>Email</th>'
+							+		'<th>phone</th>'
+							+		'<th>#</th>'
+							+	'</tr>'
+						+	'</thead>'
+						+	'<tbody id="search-customer-tbl">'
+						+	'</tbody>'
+					+	'</table>');
+					
+					$.each(data, function(key, val) {	
 						$('#search-customer-tbl').append('<tr><td id="customer-name'+ val.id+'">'+ val.name +'</td><td>'
 								+ val.phone +'</td><td>'+ val.email +'</td><td><button type="button" id="'+ val.id +'" class="btn-choose-customer'
 								+ val.id +' btn-choose-customer btn btn-primary"  data-dismiss="modal">Choose</button></td></tr>');
 					});
 				}, 
 				error : function(){
-					$('#search-customer-tbl').empty();
-					alert('show selected transferStock data in modal failed');
+					$('##table-cust').empty();
+					//alert('show selected transferStock data in modal failed');
 				}
 			})
 		}
@@ -181,16 +200,16 @@ $(document).ready(function() {
 					$.each(data, function(key, val) {
 						if(added.indexOf(val.id.toString()) == -1) {
 							$('#item-tbl').append('<tr><td>'+ val.itemVariant.item.name +'-'+ val.itemVariant.name +'</td><td>Rp.'
-									+ val.itemVariant.price +'</td><td id="td-qty'+ val.id +'"><input type="number" class="add-item-qty'+ val.id +'" value="1" min="1" max="'+val.endingQty+'" /></td><td><button type="button" id="'+ val.id +'" class="btn-add-item'
-									+ val.id +' btn-add-item btn btn-primary">Add</button><button type="button" id="'+ val.id +'" class="btn-added-item'
-									+ val.id +' btn-added-item btn">Added</button></td></tr>');
+									+ val.itemVariant.price +'</td><td id="td-qty'+ val.id +'"><input type="number" class="add-item-qty'+ val.id +'" value="1" min="1" max="'+val.endingQty+'" data-parsley-required="true" required /></td><td><button type="button" id="'+ val.id +'" class="btn-add-item'
+									+ val.id +' btn-add-item btn btn-primary">&#10004;</button><button 	type="button" id="'+ val.id +'" class="btn-added-item'
+									+ val.id +' btn-added-item btn btn-success">&#10004;</button></td></tr>');
 							$('.btn-added-item'+val.id).hide();
 						} else {
 							var a = added.indexOf(val.id.toString());
 							$('#item-tbl').append('<tr><td>'+ val.itemVariant.item.name +'-'+ val.itemVariant.name +'</td><td>Rp.'
 									+ val.itemVariant.price +'</td><td id="td-qty'+ val.id +'">'+addedQty[a]+'</td><td><button type="button" id="'+ val.id +'" class="btn-add-item'
-									+ val.id +' btn-add-item btn btn-primary">Add</button><button type="button" id="'+ val.id +'" class="btn-added-item'
-									+ val.id +' btn-added-item btn">Added</button></td></tr>');
+									+ val.id +' btn-add-item btn btn-primary">&#10004;</button><button type="button" id="'+ val.id +'" class="btn-added-item'
+									+ val.id +' btn-added-item btn btn-success">&#10004;</button></td></tr>');
 							$('.btn-add-item'+val.id).hide();
 						}
 					});
@@ -210,42 +229,48 @@ $(document).ready(function() {
 	$('body').on('click', 'button.btn-add-item', function(){
 		var id = $(this).attr('id');
 		var transQty = $('.add-item-qty'+id).val();
-		if (transQty<1) {
-			alert("at least 1");
-		} else {
-			added.push(id);
-			addedQty.push(transQty);
-			$('#td-qty'+id).html(transQty);
-			$(this).hide();
-			$('.btn-added-item'+id).show();
-			$.ajax({
-				type : 'GET',
-				url : '${pageContext.request.contextPath}/transaction/sales-order/get-one-item/'+id,
-				dataType: 'json',
-				success : function(data){
-					document.getElementById("charge").disabled = false;
-					if (added.length=="1") {
-						$('#salesOrder-tbl-body').empty();
+		
+		validate=$('#form-sales-order').parsley();
+		validate.validate();
+		
+		if(validate.isValid()){
+			if (transQty<1) {
+				alert("at least 1");
+			} else {
+				added.push(id);
+				addedQty.push(transQty);
+				$('#td-qty'+id).html(transQty);
+				$(this).hide();
+				$('.btn-added-item'+id).show();
+				$.ajax({
+					type : 'GET',
+					url : '${pageContext.request.contextPath}/transaction/sales-order/get-one-item/'+id,
+					dataType: 'json',
+					success : function(data){
+						document.getElementById("charge").disabled = false;
+						if (added.length=="1") {
+							$('#salesOrder-tbl-body').empty();
+						}
+						
+						$('#salesOrder-tbl-body').append('<tr id="tr-salesOrder'+ data.id +'"><td id="'+ data.itemVariant.id +'">'+ data.itemVariant.item.name +'-'+ data.itemVariant.name +'</td><td>Rp.'
+								+ data.itemVariant.price +'</td><td>'+ transQty +'</td><td>Rp.'+ data.itemVariant.price*transQty +'</td><td><button type="button" id="'+ data.id +'" class="btn-cancel-item'
+								+ data.id +' btn-cancel-item btn btn-danger"> &#10006;</button></td></tr>');
+						$('#salesOrder-tbl-foot').empty();
+						var total = 0;
+						
+						$('#salesOrder-tbl-body > tr').each(function(index, data){
+							var price = $(data).find('td').eq(3).text().split("Rp.")[1];
+							total = total + parseInt(price);
+						})
+						
+						$('#salesOrder-tbl-foot').append('<tr id="tr-total-item"><th colspan="3">TOTAL</th><th colspan="2">Rp. '+ total +'</th></tr>');
+						$('#charge').text("Charge Rp."+total)
+					},
+					error : function(){
+						alert('get one item inventory failed');
 					}
-					
-					$('#salesOrder-tbl-body').append('<tr id="tr-salesOrder'+ data.id +'"><td id="'+ data.itemVariant.id +'">'+ data.itemVariant.item.name +'-'+ data.itemVariant.name +'</td><td>Rp.'
-							+ data.itemVariant.price +'</td><td>'+ transQty +'</td><td>Rp.'+ data.itemVariant.price*transQty +'</td><td><button type="button" id="'+ data.id +'" class="btn-cancel-item'
-							+ data.id +' btn-cancel-item btn btn-primary">Cancel</button></td></tr>');
-					$('#salesOrder-tbl-foot').empty();
-					var total = 0;
-					
-					$('#salesOrder-tbl-body > tr').each(function(index, data){
-						var price = $(data).find('td').eq(3).text().split("Rp.")[1];
-						total = total + parseInt(price);
-					})
-					
-					//$('#total-harga-fix').append('<tr id="tr-total-item"><th colspan="3">TOTAL</th><th colspan="2">Rp. '+ total +'</th></tr>');
-					$('#charge').text("Charge Rp."+total)
-				},
-				error : function(){
-					alert('get one item inventory failed');
-				}
-			})
+				})
+			}
 		}
 	})
 	
@@ -320,53 +345,29 @@ $(document).ready(function() {
 	
 	//charge
 		$('#charge').on('click',function(){
+		
+		var total = parseInt($('#charge').text().split("Rp.")[1]);
 		if ($('.customer').attr("id") === undefined) {
 			alert("choose customer first");
 		}else {
-			$('#modal-charge-sales-order').modal();
+			$('#charge-cash-label').append( "<input type='number' class='form-control' id='charge-cash' value="+total+" min="+total+" data-parsley-required='true' required>");
+			$('#modal-charge-sales-order').modal({backdrop: 'static', keyboard: false});
 		}
 	});
 	
 	//done
 		$('#charge-done').click(function(){
-		var cash = parseInt($('#charge-cash').val());
-		var total = parseInt($('#charge').text().split("Rp.")[1]);
-		$('#receipt-cash').val("Out of Rp."+cash);
-		$('#receipt-change').val("Rp."+(cash-total));
-		$('#modal-receipt-sales-order').modal();
-		
-		var dataForUpdate = [];
-		$('#salesOrder-tbl-body > tr').each(function(index, data){
-			//for update inventory in database
-			var updateInventory = {
-					id : $(data).find('td').eq(0).attr('id'), //inventory
-					qtySalesOrder : $(data).find('td').eq(2).text() //untuk ngurangi stock
-			}
-			dataForUpdate.push(updateInventory);
-		});
-		
-		 dataForUpdate.forEach(function(element){
-	   		$.ajax({
- 				url : '${pageContext.request.contextPath}/transaction/transfer-stock/search-item-inventory?search='+element.id,
-				type : 'GET',
-				dataType : 'json',
-				success : function(data){
-			 		$.each(data, function(key, val) {
 
-					$('#inventory-tbl-body').append('<tr><td>'+val.id+'</td>'
-				 	 		+ '<td>'+element.qtySalesOrder+'</td>'
-				 	 		+ '<td>'+val.outlet.id+'</td>'
-							+ '</tr>');
-			 		});
-				},
-				error : function(data){
-					alert('failed')
-				}
- 			});   
- 		 });
+		validate=$('#form-charge-so').parsley();
+		validate.validate();
 		
-		
-		
+		if(validate.isValid()){
+			var cash = parseInt($('#charge-cash').val());
+			var total = parseInt($('#charge').text().split("Rp.")[1]);
+			document.getElementById("receipt-cash").innerHTML = "Out of Rp."+cash;
+			document.getElementById("receipt-change").innerHTML = "Rp."+(cash-total);
+			$('#modal-receipt-sales-order').modal({backdrop: 'static', keyboard: false});
+		}
 		
 	})
 	
@@ -407,37 +408,7 @@ $(document).ready(function() {
 				alert('save failed');
 			}
 			
-		}) 
-		
-		
-		$('#inventory-tbl-body > tr').each(function(index, data){
-			var updateDataInventory = {
-				id : $(data).find('td').eq(0).text(),
-				salesOrderQty :  $(data).find('td').eq(1).text(),
-				outlet : {
-					id : $(data).find('td').eq(2).text()
-				}
-			}
-			
-			$.ajax({
-				url : '${pageContext.request.contextPath}/item/update-inventory-so',
-				type : 'PUT',
-				data : JSON.stringify(updateDataInventory),
-				contentType : 'application/json',
-				success : function(){
-					alert('update to inventory');
-				}, error : function(){
-					alert('update inventory failed');
-				}
-			
-			}) 
-			
-		});
-		
-		
-		
-	
-		
+		}) 		
 	})
 });
 </script>
@@ -457,7 +428,7 @@ $(document).ready(function() {
 				<div class="box-body">
 				<div class="col-lg-6">
 					<input type="text" id="search-item" class="form-control" placeholder="Search">
-					
+				<form id="form-sales-order" style="border:none">
 					<table id="table-item" class="table table-stripped table-bordered table-hover">
 						<thead>
 							<th>Item</th>
@@ -468,6 +439,7 @@ $(document).ready(function() {
 						<tbody id="item-tbl">
 						</tbody>
 					</table>
+				</form>
 				</div>
 				<div class="col-lg-6">
 					<a href="#" class="customer form-control btn btn-primary">Choose Customer</a>
@@ -489,7 +461,9 @@ $(document).ready(function() {
 							</tr>
 						</tfoot>
 					</table>
+					<div>
 					
+					</div>
 						<a href="#" id="clear-sale" class="clear-sod btn btn-primary">Clear Sale</a>
 						<a href="#" id="charge" class="bayar-sod btn btn-primary">Charge Rp</a>
 					</div>

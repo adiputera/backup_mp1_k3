@@ -35,7 +35,7 @@
 	    
 	    <div class="col-xs-2">
 		    <div class="form-group">
-		    	<input type="button" id="btn-export" class="btn btn-md btn-primary btn-block" value="Export">
+		    	<a href="${pageContext.request.contextPath}/generate/pr" id="btn-export" class="btn btn-md btn-primary btn-block">Export</a>
 		    </div>
 	    </div>
 	    <div class="col-xs-2">
@@ -88,12 +88,13 @@
 					</div>
 					<button type="button" class="close" data-dismiss="modal"
 						aria-hidden="true">&times;</button>
-						<h4 class="modal-title">Create New PR : </h4>
-						<select id = "pil-outlet">
+						<h4 class="modal-title">Create New PR : ${outletLogin.name }</h4>
+						<input type="hidden" id = "pil-outlet" value="${outletLogin.id }">
+						<%-- <select id = "pil-outlet">
 							<c:forEach items="${outlets }" var="outlet">
 								<option value="${outlet.id }">${outlet.name }</option>
 							</c:forEach>
-						</select>
+						</select> --%>
 				</div>
 				<div class="modal-body">
 				<form id="tambah-pr">
@@ -177,7 +178,7 @@
 	var itemsss = [];
 	$.ajax({
 		type : 'get',
-		url : '${pageContext.request.contextPath}/item/get-inventory',
+		url : '${pageContext.request.contextPath}/transaksi/purchase-request/get-item',
 		dataType : 'json',
 		success : function(data){
 			$.each(data, function(key, val) {
@@ -209,7 +210,11 @@
 		        $('#pilih-tanggal-range').html(start.format('D MMMM YYYY') + ' - ' + end.format('D MMMM YYYY'));
 		        awal = start.format('YYYY-MM-DD');
 		        akhir = end.format('YYYY-MM-DD');
-		        ur = '${pageContext.request.contextPath}/transaksi/purchase-request/search-date?awal='+awal+'&akhir='+akhir;
+		        if(awal == akhir){
+		        	ur = '${pageContext.request.contextPath}/transaksi/purchase-request/search-one-date?date='+awal;
+		        }else{
+		        	ur = '${pageContext.request.contextPath}/transaksi/purchase-request/search-date?awal='+awal+'&akhir='+akhir;
+		        }
 		        search();
 		      }
 	    );
@@ -233,7 +238,7 @@
 				simpan();
 			}else if(jmlBrg == 0){
 				$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
-				$('#tampilan-alert').html('<strong>Gagal!</strong> Mohon Pilih Item');
+				$('#tampilan-alert').html('<strong>Error!</strong> Mohon Pilih Item');
 				$('#div-alert').fadeIn();
 				setTimeout(function(){
 					$('#div-alert').fadeOut();
@@ -253,7 +258,7 @@
 				simpan();
 			}else if(jmlBrg == 0){
 				$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
-				$('#tampilan-alert').html('<strong>Gagal!</strong> Mohon Pilih Item');
+				$('#tampilan-alert').html('<strong>Error!</strong> Mohon Pilih Item');
 				$('#div-alert').fadeIn();
 				setTimeout(function(){
 					$('#div-alert').fadeOut();
@@ -301,7 +306,7 @@
 				},
 				error : function() {
 					$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
-					$('#tampilan-alert').html('<strong>Gagal!</strong> Gagal Menyimpan ke Database');
+					$('#tampilan-alert').html('<strong>Error!</strong> Gagal Menyimpan ke Database');
 					$('#div-alert').fadeIn();
 					setTimeout(function(){
 						$('#div-alert').fadeOut();
@@ -315,7 +320,6 @@
 		var addedEdit = [];
 		var lagiEdit = 0;
 		// auto complete
-		var itemsss = [];
 		var itemss = {
 				data : itemsss,
 		};

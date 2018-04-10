@@ -64,8 +64,7 @@
 		$('#tbl-simpan').on('click', function(e){
 			e.preventDefault();
 			var category = {
-				name : $('#create-category').val(),
-				active : true
+				name : $('#create-category').val()
 			};
 			$.ajax({
 				url : '${pageContext.request.contextPath}/master/category/save',
@@ -85,7 +84,7 @@
 		});
 		
 		
-		$('.btn-edit').on('click', function(e){
+		$('#category-table').on('click', '.btn-edit', function(e){
 			e.preventDefault();
 			var id = $(this).attr('id');
 			$.ajax({

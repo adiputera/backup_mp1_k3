@@ -6,51 +6,56 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Edit Variant</h5>
-				<button type="button" class="close" data-dismiss="modal"
-					aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
+				<h5 class="modal-title" id="exampleModalLabel" align="center">Edit Variant</h5>
 			</div>
 			<div class="modal-body">
-				<form class="form-all" id="form-edititem-variant-edit-data">
+				<form style="border:none" class="form-all" id="form-edititem-variant-edit-data">	
+					<!-- ZZZZZZZZZZZZZZZZZZZZ -->
+					
+					<div class="form-group" align="left" style="float:left;width:33%">
+					<label>Variant Name</label>
+						<input type="text" placeholder="Variant Name" 
+							 id="edititem-edit-variant-name" data-parsley-required="true" data-required-message="Please insert your name" required>
+					</div>
+					
+					<div class="form-group" style="float:left ;width:33%">
+					<label>Unit Price</label>
+					<input type="number" placeholder="Unit Price" id="edititem-edit-unit-price" required>
+					</div>
+					
+					<div class="form-group" style="float:left;width:33%">
+					<label>SKU</label>
+					<input type="text" placeholder="SKU"
+							 id="edititem-edit-sku" data-parsley-required="true" required>
+					</div>
+
 					<div class="form-group">
-						<label for="input-variant-name">Variant Namee</label> <input type="text"
-							class="form-control" id="edititem-edit-variant-name" data-parsley-required="true" required>
+
+						<div style="float:left;width:33%">
+							<label>Beginning Stock</label>
+							<input placeholder="Beginning Stock" type="number" id="edititem-edit-beginning-stock" data-parsley-required="true" required>
+						</div>
+						
+						<div style="float:left;width:33%">
+						<label>Alert at</label>
+							<input placeholder="Alert At" type="number" id="edititem-edit-alert-at" data-parsley-required="true" required>
+						</div>
 					</div>
 					
-					<div class="form-group">
-						<label for="input-variant-name">Unit Price</label> <input type="text"
-							class="form-control" id="edititem-edit-unit-price" data-parsley-required="true" required>
-					</div>
-					
-					<div class="form-group">
-						<label for="input-variant-name">SKU</label> <input type="text"
-							class="form-control" id="edititem-edit-sku" data-parsley-required="true" required>
-					</div>
-					
-					<div class="form-group">
-						<label for="input-variant-name">Beginning Stock</label> <input type="text"
-							class="form-control" id="edititem-edit-beginning-stock" data-parsley-required="true" required>
-					</div>
-					
-						<div class="form-group">
-						<label for="input-variant-name">Alert at</label> <input type="text"
-							class="form-control" id="edititem-edit-alert-at" data-parsley-required="true" required>
-					</div>
-					
-					<div class="checkbox" style="display:none" >
-						<label for="edit-active"><input id="edititem-edit-active-variant" type="checkbox"
+					<div style="clear: both	"></div>	
+		
+					<div class="checkbox" style="display:none">
+						<label for="add-active"><input id="edititem-edit-active-variant" type="checkbox"
 							value="true">Active</label>
-					</div>
-					
+					</div> 
+							
 					<input type="hidden" id="variant-id" class="form-control">
 					<input type="hidden" id="inventory-id" class="form-control">
 					<input type="hidden" id="id-item-hidden" class="form-control">		
 
 					<div class="modal-footer">
 						<button type="button" id="edititem-btn-close" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-						<button type="submit" id="edititem-btn-save-variant" class="btn btn-primary">Add</button>
+						<button type="submit" id="edititem-btn-save-variant" class="btn btn-primary">Save</button>
 					</div>
 				</form>
 

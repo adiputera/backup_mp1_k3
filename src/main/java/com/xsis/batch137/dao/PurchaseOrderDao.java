@@ -3,6 +3,7 @@ package com.xsis.batch137.dao;
 import java.util.Date;
 import java.util.List;
 
+import com.xsis.batch137.model.Outlet;
 import com.xsis.batch137.model.PurchaseOrder;
 import com.xsis.batch137.model.PurchaseRequest;
 
@@ -33,4 +34,8 @@ public interface PurchaseOrderDao {
 	void reject(long id);
 	
 	void process(long id);
+	
+	List<PurchaseOrder> searchPOByOneDate(Date date);
+	
+	List<PurchaseOrder> getPOByOutlet(Outlet outlet);
 }

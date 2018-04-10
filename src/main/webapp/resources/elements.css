@@ -8,6 +8,13 @@ form {
 	
 }
 
+#logoutForm {
+  all: initial;
+  * {
+    all: unset;
+  }
+}
+
 .checkbox-teal [type="checkbox"]:checked+label:before {
     border-color: transparent #009688 #009688 transparent;
 }
@@ -34,4 +41,12 @@ form {
     color: #721c24;
     background-color: #f8d7da;
     border-color: #f5c6cb;
+}
+
+@media print
+{    
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
 }

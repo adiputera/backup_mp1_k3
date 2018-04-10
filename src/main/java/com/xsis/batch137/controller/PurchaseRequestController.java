@@ -3,6 +3,8 @@ package com.xsis.batch137.controller;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -38,14 +40,15 @@ public class PurchaseRequestController {
 	@Autowired
 	ItemInventoryService iService;
 	
+	@Autowired
+	HttpSession httpSession;
+	
 	@RequestMapping
 	public String index(Model model) {
-		List<PurchaseRequest> prs = prService.selectAll();
-		List<Outlet> outlets = oService.selectActive();
+		List<PurchaseRequest> prs = prService.selectByOutlet();
 		List<ItemInventory> items = iService.selectAll();
 		model.addAttribute("prs", prs);
 		model.addAttribute("items", items);
-		model.addAttribute("outlets", outlets);
 		return "purchaseRequest/purchaseRequest";
 	}
 	
@@ -71,7 +74,15 @@ public class PurchaseRequestController {
 	@RequestMapping(value="/search-item",method=RequestMethod.GET)
 	@ResponseBody
 	public List<ItemInventory> searchItem(@RequestParam(value="search", defaultValue="") String search){
-		List<ItemInventory > itemInventories = iService.searchItemInventoryByItemName(search);
+		List<ItemInventory > itemInventories = iService.searchItemInventoryByItemNameAndOutlet(search);
+		return itemInventories;
+	}
+	
+	@RequestMapping(value="/get-item",method=RequestMethod.GET)
+	@ResponseBody
+	public List<ItemInventory> getItem(){
+		Outlet outlet = (Outlet) httpSession.getAttribute("outletLogin");
+		List<ItemInventory > itemInventories = iService.getItemInventoryByOutletLogin(outlet.getId());
 		return itemInventories;
 	}
 	
@@ -91,6 +102,12 @@ public class PurchaseRequestController {
 	@ResponseBody
 	public List<PurchaseRequest> getByDate(@RequestParam(value="awal", defaultValue="") @DateTimeFormat(pattern="yyyy-MM-dd") Date awal, @RequestParam(value="akhir", defaultValue="") @DateTimeFormat(pattern="yyyy-MM-dd") Date akhir){
 		return prService.getPRByDate(awal, akhir);
+	}
+	
+	@RequestMapping("/search-one-date")
+	@ResponseBody
+	public List<PurchaseRequest> getByOneDate(@RequestParam(value="date", defaultValue="") @DateTimeFormat(pattern="yyyy-MM-dd") Date date){
+		return prService.getPRByOneDate(date);
 	}
 	
 	@RequestMapping("/get-one/{id}")
