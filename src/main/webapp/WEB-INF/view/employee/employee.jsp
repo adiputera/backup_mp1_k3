@@ -128,7 +128,7 @@
 					<td>
 						<script>
 							if("${emp.haveAccount}" === "true" && "${emp.user.active}" === "true"){
-									document.write("${emp.user.role.name }");
+									document.write("${emp.user.role.description }");
 								}else if("${emp.haveAccount}" === "true" && "${emp.user.active}" === "false"){
 									document.write("User Tidak Aktif");
 								}else{
@@ -417,28 +417,7 @@
 						}
 					});
 				}
-			}/* else if(validate.isValid() && emailValid == 0 && userValid == 0){
-				$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
-				$('#tampilan-alert').html('<strong>Error!</strong> Username dan Email tidak Unique.');
-				$('#div-alert').fadeIn();
-				setTimeout(function(){
-					$('#div-alert').fadeOut();
-				}, 4000);
-			}else if(validate.isValid() && emailValid == 0 && userValid == 1){
-				$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
-				$('#tampilan-alert').html('<strong>Erro!</strong> Email tidak Unique.');
-				$('#div-alert').fadeIn();
-				setTimeout(function(){
-					$('#div-alert').fadeOut();
-				}, 4000);
-			}else if(validate.isValid() && emailValid == 1 && userValid == 0){
-				$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
-				$('#tampilan-alert').html('<strong>Erro!</strong> Username tidak Unique.');
-				$('#div-alert').fadeIn();
-				setTimeout(function(){
-					$('#div-alert').fadeOut();
-				}, 4000);
-			} */else{
+			}else{
 				$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
 				$('#tampilan-alert').html('<strong>Error!</strong> Gagal Menyimpan ke Database.');
 				$('#div-alert').fadeIn();
@@ -525,7 +504,7 @@
 					type : 'get',
 					url : '${pageContext.request.contextPath}/master/employee/cek-user?user='+username,
 					success : function(data){
-						if(data > 0 && $('#cek-akun').is(":checked") && username != userEdit){
+						if((data > 0 && $('#cek-akun').is(":checked") && username != userEdit) || username == 'superadmin'){
 							$('#div-username').removeClass('has-success').addClass('has-error');
 							$('#lbl-username').html('<i class="fa fa-times-circle-o"></i> username must be unique');
 							$('#lbl-username').fadeIn();
