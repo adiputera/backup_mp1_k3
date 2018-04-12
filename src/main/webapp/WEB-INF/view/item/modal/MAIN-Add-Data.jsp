@@ -1,31 +1,65 @@
 <!-- Modal -->
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-
 <script>
-
-function readURL(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function (e) {
-            $('#blah')
-                .attr('src', e.target.result)
-                .width(150)
-                .height(200)	;
-        };
-
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-	
+$('.fileinput').fileinput()
 </script>
 
 <style>
-  article, aside, figure, footer, header, hgroup, 
-  menu, nav, section { display: block; }
+  input.parsley-success,
+select.parsley-success,
+textarea.parsley-success {
+    color: #468847;
+    background-color: #F2F9F0 !important;
+    border: 1px solid #D6E9C6;
+}
+
+input.parsley-error,
+select.parsley-error,
+textarea.parsley-error {
+    color: #B94A48;
+    background-color: #F9F0F0 !important;
+    border: 1px solid #f09784;
+}
+
+.parsley-errors-list {
+    list-style-type: none;
+    opacity: 0;
+    transition: all .3s ease-in;
+
+    color: #d16e6c;
+    margin-top: 5px;
+    margin-bottom: 0;
+  padding-left: 0;
+}
+
+.parsley-errors-list.filled {
+    opacity: 1;
+}
+
+<style>
+.kv-avatar .krajee-default.file-preview-frame,.kv-avatar .krajee-default.file-preview-frame:hover {
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    text-align: center;
+}
+.kv-avatar {
+    display: inline-block;
+}
+.kv-avatar .file-input {
+    display: table-cell;
+    width: 213px;
+}
+.kv-reqd {
+    color: red;
+    font-family: monospace;
+    font-weight: normal;
+}
 </style>
 
+</style>
 
 <div class="modal fade" id="modal-create-data" tabindex="-1" role="dialog"
 	aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -36,11 +70,32 @@ function readURL(input) {
 			</div>
 			<div class="modal-body">
 				<form style="border:none" id="form-add-data" class="form-all">
-					        			
+				 	<div class="row" id="div-alert" style="display:none;">
+						<div class="col-xs-12">
+							<div id="tampilan-alert" class="alert alert-sukses" role="alert">
+								<strong>Sukses!</strong> Data Berhasil Disimpan.
+							</div>
+						</div>
+					</div>
+					
+					<!-- <div>
+						<input type='file'  id="images-input" onchange="preview_image(event)"/>
+						<img id="output_image" alt="your image" style="max-width: 100%"/>
+					</div>z -->
+					
+					<div class="fileinput fileinput-new" data-provides="fileinput">
+  						<div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;"></div>
+ 					<div>
+   					 <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span>
+   					 <input id="images-input" type="file" name="..."></span>
+    					<a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+  						</div>
+						</div>
+					
 					<div class="form-group">
 						<label for="input-item-name">Item Name</label> <input type="text"
-							class="form-control" id="add-item-name" placeholder="enter item name" data-required-message="Please insert your name"
-							data-parsley-required="true" required>
+							class="form-control" id="add-item-name" placeholder="Enter item name" data-parsley-required-message="Please insert the item name"
+							data-parsley-required>
 					</div>
 					
 					<div>

@@ -45,6 +45,7 @@
 				<th>In Stock</th>
 				<th>Stock Alert</th>
 				<th>Action</th>
+				
 			</tr>
 		</thead>
 		<tbody id="full-data-utama">
@@ -97,7 +98,12 @@ $(document).ready(function(){
 	}); 
 /* ============================== [SHOW MODAL] FOR ADD VARIANT ======================================*/
     $('#btn-add-variant').on('click', function(evt) {
-    	
+	   	document.getElementById('form-add-varian-data').reset();
+		$('#form-add-varian-data').parsley().reset();
+		$('#div-add-sku').removeClass('has-error');
+		//$('#lbl-sku').html();
+		document.getElementById('lbl-sku').style.display = "none";
+
 		validate=$('#form-add-data').parsley();
 		validate.validate();
 		
@@ -116,6 +122,7 @@ $(document).ready(function(){
 		clearFormEdit();
 	});
    
+    var uniqueSku=[];
 /* =================== [ADD] VARIANT DATA TO TABLE MODAL-CREATE-DATA ===================================*/
 	 $('#btn-add-data-variant').on('click', function(evt) {
 		 evt.preventDefault;
@@ -123,16 +130,17 @@ $(document).ready(function(){
 		 validate=$('#form-add-varian-data').parsley();
 			validate.validate();
 			
-			if(validate.isValid()){
+			if(validate.isValid() && skuValid==1){
 				$('#modal-add-variant').modal('toggle');
 				$('#isi-popup-itm').append('<tr id=tr-item' + index + '><td><p id=' + index + '>'+ $('#add-variant-name').val()+'</p></td><td><p>'+
 						$('#add-unit-price').val()+'</p></td><td><p>'+$('#add-sku').val()
 						+'</p></td><td><p>'+$('#add-beginning-stock').val()+'</p></td><td style="display:none"><p>'+$('#add-alert-at').val()
 						+'</p></td> <td style="display:none"><p>'+$('#add-active-variant').val()+'</p></td>'
 						+'<td> <a href="#" id="tombol-edit-variant">Edit</a> | <a href="#" id="delete-variant-data" >Delete </a>'+'</td></tr>');
-			
 			 index++;
 			 console.log(index);
+			 uniqueSku.push($('#add-sku').val().toLowerCase());
+			 console.log(uniqueSku)
 			}
 		 
 		 //reloadTableCreateAddVariant();
@@ -158,7 +166,7 @@ $(document).ready(function(){
 		 validate=$('#form-variant-edit-data').parsley();
 		 validate.validate();
 			
-			if(validate.isValid()){
+			if(validate.isValid() && skuValid==1){
 			 	$('#modal-edit-variant').modal('toggle');
 				var index=$('#id-item-hidden-variant-edit').val();
 				 console.log(index)
@@ -204,7 +212,17 @@ $(document).ready(function(){
 /* =================== [DELETE] VARIANT DATA AT TABLE MODAL-CREATE-DATA ===================================*/
 	 $("#isi-popup-itm").on('click','#delete-variant-data',function(){
 	        $(this).parent().parent().remove();
+	        var element = $(this).parent().parent();
+	        var skuToDelete = element.find('td').eq(2).find('p').text();
+			var a = uniqueSku.indexOf(skuToDelete.toString());
+			uniqueSku.splice(a,1);
+
 	    });
+	    
+	 $('#btn-cancel-add-variant').on('click',function(){
+	     $('#modal-add-variant').modal('toggle');
+
+	 });
 	    
 	 $("#isi-popup-edit").on('click','#edititem-delete-variant-data',function(){
 	        var element = $(this).parent().parent();
@@ -226,6 +244,7 @@ $(document).ready(function(){
 /* =================== [DELETE] VARIANT DATA AT MODAL-CREATE-DATA ===================================*/
 	 $("#btn-cancel").on('click',function(){
 			 clearFormAddItem();	
+			 uniqueSku = [];
 	    });	  
 
 	
@@ -242,8 +261,7 @@ $(document).ready(function(){
 		 clearFormEditItem();
 	 });
 	 
-	 
-	 
+    
 /* ========================== [SHOW MODAL] EDIT VARIANT DATA ========================================*/
 	 $("#isi-popup-itm").on('click','#tombol-edit-variant',function(evt){
 		 evt.preventDefault();
@@ -277,9 +295,28 @@ $(document).ready(function(){
 	   		$('#id-item-hidden').val(element.find('td').eq(0).find('p').attr('id'));
 	    });
 	    
+	 
+	 
+	 //urusan image
+/* 	 function preview_image(event) 
+		{
+			 var reader = new FileReader();
+	 		reader.onload = function()
+			 	{
+				  var output = document.getElementById('output_image');
+				  output.src = reader.result;
+				 }
+	 			reader.readAsDataURL(event.target.files[0]);
+	} */
 /* ============================== [EXECUTE] CREATE DATA UTAMA ======================================*/
 		$('#btn-create-data').on('click',function(evt){
-		
+			
+			//upload Image
+			var formData = new FormData();
+			formData.append('image',$('#images-input')[0].files[0]); //baca filenya
+		/* 	console.log(image); */
+			
+			
 			evt.preventDefault();
 			var active = "true";
 /* 		      $(':checkbox:checked').each(function(){
@@ -312,47 +349,160 @@ $(document).ready(function(){
 		    
 		    console.log(itemVar)
 		    
-		    var item = {
-		    	name : $('#add-item-name').val(),
-		    	active : active,
-		    	category:{
-		    		id :  $('#add-category').val()
-		    	},
-		    	itemVariants : itemVar
-		    }
 		
-		    console.log(item)
 		    
 			validate=$('#form-add-data').parsley();
 			validate.validate();
 			
 			if(validate.isValid()){
-			    $.ajax({
-			    	url:'${pageContext.request.contextPath}/master/item/save',
-			    	type : 'POST',
-			    	data : JSON.stringify(item),
-			    	contentType : 'application/JSON',
-			    	success : function(){
-			    		alert('save success')
-			    		window.location = '${pageContext.request.contextPath}/master/item/';
-			    	},
-			    	error : function(){
-			    		alert('save failed')
-			    	}
-			    });   
+				$.ajax({
+					type : 'POST',
+					url : '${pageContext.request.contextPath}/master/item/upload',
+					data : formData,
+					contentType : false,
+					processData : false,
+					cache : false,
+					success : function(data){
+					     var item = {
+						    	name : $('#add-item-name').val(),
+						    	image : data,
+						    	active : active,
+						    	category:{
+						    		id :  $('#add-category').val()
+						    	},
+						    	itemVariants : itemVar
+						    }
+						
+						    console.log(data) 
+						    
+							$.ajax({
+					    	url:'${pageContext.request.contextPath}/master/item/save',
+					    	type : 'POST',
+					    	data : JSON.stringify(item),
+					    	contentType : 'application/JSON',
+					    	success : function(){
+					    		$('#tampilan-alert').removeClass('alert-gagal').addClass('alert-sukses');
+					    		$('#tampilan-alert').html('<strong>Sukses!</strong> Berhasil Menyimpan ke Database');
+					    		$('#div-alert').fadeIn();
+					    		
+					    		setTimeout(function(){
+						    		window.location = '${pageContext.request.contextPath}/master/item/';
+						    		},1000);
+					    	},
+					    	error : function(){
+					    		$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
+					    		$('#tampilan-alert').html('<strong>Error!</strong> Gagal Menyimpan ke Database');
+					    		$('#div-alert').fadeIn(); 
+					    	}
+					    }); 
+						    
+						    
+						
+					},
+					
+					error : function(){
+						alert('error')
+					}
+					
+				});
+		
 			}
 		    
 		  
 		});
 		
+		var skuValid;
+		
+		$('#add-sku').on('input',function(){
+			var sku = $('#add-sku').val();
+			
+	/* 		if(uniqueSku.indexOf(sku.toString().toLowerCase())==-1){
+				$('#div-add-sku').removeClass('has-success').addClass('has-error');
+				$('#lbl-sku').fadeOut();
+				skuValid = 1;
+			} 
+			
+			 else{
+				 $('#div-add-sku').removeClass('has-success').addClass('has-error');
+					$('#lbl-sku').html('SKU must be unique');
+					$('#lbl-sku').fadeIn();
+					skuValid = 0;	
+			} */
+			
+			
+			//console.log(sku)
+			$.ajax({
+				type : 'get',
+				url : '${pageContext.request.contextPath}/master/item/cek-sku?sku='+sku,
+				success : function(data){
+					
+					
+					if(data>0){
+						$('#div-add-sku').removeClass('has-success').addClass('has-error');
+						$('#lbl-sku').html('SKU must be unique');
+						$('#lbl-sku').fadeIn();
+						skuValid = 0;
+					}
+					
+					else{
+						//console.log('oke')
+						$('#div-add-sku').removeClass('has-error');
+						$('#lbl-sku').fadeOut();
+						skuValid = 1;
+						
+						if(uniqueSku.indexOf(sku.toString().toLowerCase())> -1){
+							$('#div-add-sku').removeClass('has-success').addClass('has-error');
+							$('#lbl-sku').html('SKU must be unique');
+							$('#lbl-sku').fadeIn();
+							skuValid = 0;
+						} 
+						
+					}
+				}, error : function(){
+					
+				}
+			});
+		});
+		
+		$('#edit-sku').on('input',function(){
+			var sku = $('#edit-sku').val();
+			console.log(sku)
+			$.ajax({
+				type : 'get',
+				url : '${pageContext.request.contextPath}/master/item/cek-sku?sku='+sku,
+				success : function(data){
+					if(data>0){
+						$('#div-edit-sku').removeClass('has-success').addClass('has-error');
+						$('#lbl-edit-sku').html('SKU must be unique');
+						$('#lbl-edit-sku').fadeIn();
+						skuValid = 0;
+					}
+					
+					else{
+						console.log('oke')
+						$('#div-edit-sku').removeClass('has-success').addClass('has-error');
+						// $('#lbl-sku').html('SKU must be unique');
+						$('#lbl-edit-sku').fadeOut();
+						skuValid = 1;
+					
+						
+					}
+				}, error : function(){
+					
+				}
+			});
+		});
+		
+		
 		
 		$('#edititem-btn-create-data').on('click',function(evt){
 			evt.preventDefault();
-			
+		
 			validate=$('#form-main-edit-data').parsley();
 			validate.validate();
 				
 				if(validate.isValid()){
+					
 					var active = "true";
 				      $('#edititem-checkbox:checked').each(function(){
 				        active=$(this).val()
@@ -403,9 +553,45 @@ $(document).ready(function(){
 				    	},
 				    	itemVariants : itemVar
 				    }
-				
+				    
+				    if(idDelete!=""){
+				    		idDelete.forEach(function(element){
+						    	$.ajax({
+									url : '${pageContext.request.contextPath}/master/item/delete-inventory/'+element,
+									type:'DELETE',
+									success : function (){
+										//alert('delete successfully');
+										//window.location = '${pageContext.request.contextPath}/master/item/';
+									},
+									
+									error : function(){
+										//alert('delete failed');
+									} 
+									  
+								});
+					    	});
+				    }
+				    
+				    if (idClear!=""){
+				        idClear.forEach(function(element){
+					    	$.ajax({
+								url : '${pageContext.request.contextPath}/master/item/delete-inventory/'+element,
+								type:'DELETE',
+								success : function (){
+									//alert('delete successfully');
+									//alert('save successfully')
+									//window.location = '${pageContext.request.contextPath}/master/item/';
+								},
+								
+								error : function(){
+									//alert('delete failed');
+								} 
+								
+							});
+					    }); 	
+				    }
+				    
 			    	console.log(item)
-				    if(item.name!==""){
 				    	//console.log(item.name)
 				    	 $.ajax({
 						    	url:'${pageContext.request.contextPath}/master/item/update',
@@ -413,48 +599,21 @@ $(document).ready(function(){
 						    	data : JSON.stringify(item),
 						    	contentType : 'application/JSON',
 						    	success : function(){
-						    		alert('save success')
-						    		window.location = '${pageContext.request.contextPath}/master/item/';
+						    		$('#tampilan-alert-edit-data').removeClass('alert-gagal').addClass('alert-sukses');
+						    		$('#tampilan-alert-edit-data').html('<strong>Sukses!</strong> Berhasil Menyimpan ke Database');
+						    		$('#div-alert-edit-data').fadeIn();
+						    		
+						    		setTimeout(function(){
+						    			window.location = '${pageContext.request.contextPath}/master/item/';
+							    		},1000);
+						    		
 						    	},
 						    	error : function(){
-						    		alert('save failed')
+						    		$('#tampilan-alert-edit-data').removeClass('alert-sukses').addClass('alert-gagal');
+						    		$('#tampilan-alert-edit-data').html('<strong>Error!</strong> Gagal Menyimpan ke Database');
+						    		$('#div-alert-edit-data').fadeIn(); 
 						    	}
-						    });
-				    }
-				    
-				    
-				    idDelete.forEach(function(element){
-				    	$.ajax({
-							url : '${pageContext.request.contextPath}/master/item/delete-inventory/'+element,
-							type:'DELETE',
-							success : function (){
-								//alert('delete successfully');
-								window.location = '${pageContext.request.contextPath}/master/item/';
-							},
-							
-							error : function(){
-								//alert('delete failed');
-							} 
-							  
-						});
-			    	});
-				    
-				    idClear.forEach(function(element){
-				    	$.ajax({
-							url : '${pageContext.request.contextPath}/master/item/delete-inventory/'+element,
-							type:'DELETE',
-							success : function (){
-								//alert('delete successfully');
-								alert('save successfully')
-								window.location = '${pageContext.request.contextPath}/master/item/';
-							},
-							
-							error : function(){
-								//alert('delete failed');
-							} 
-							
-						});
-				    });  	
+						    });		    
 				}
 		    
 		});
@@ -475,8 +634,11 @@ $(document).ready(function(){
 				success : function(xxx){	
 					$('#edit-itm').modal({backdrop: 'static', keyboard: false});
 					$('#edit-item-input-id').val(parseInt(id));
+				
 				 	var index = 0;
 					$.each(xxx,function(key,val){
+						var image = val.itemVariant.item.image;
+						$('#images-edit').attr('src','${pageContext.request.contextPath}/resources/img/'+image);
 						$('#edititem-item-name').val(val.itemVariant.item.name);
 						$('#edititem-category').val(val.itemVariant.item.category.id);
 						$('#outlet-id').val(val.outlet.id);
@@ -524,7 +686,7 @@ $(document).ready(function(){
    				+'<td style="display:none"><p>null</p></td>'
    				+'<td style="display:none"><p>null</p></td>'
    				+'<td style="display:none"><p>'+$('#outlet-id').val()+'</p></td>'
-    			+'<td><a href="#" id="edititem-tombol-edit-variant" class="btn-warning"> Edit </a> | <a href="#" id="edititem-delete-variant-data">&#10006; </a>'+'</td></tr>');
+    			+'<td><a href="#" id="edititem-tombol-edit-variant"> Edit </a> | <a href="#" id="edititem-delete-variant-data">Delete </a>'+'</td></tr>');
     }
    
 	function clearForm() {
@@ -554,9 +716,7 @@ $(document).ready(function(){
 		//$('#edititem-category').val('');
 		$('#isi-popup-edit').empty();
 	}
-	
-	
-	
+
 	//search
  	$('#search-box').on('input',function(e){
 		var keyword = $(this).val();
@@ -588,6 +748,8 @@ $(document).ready(function(){
  	$('#export').click(function(){
 		window.location = '${pageContext.request.contextPath}/generate/item'; 
 	})
+	
+	
 	
 });
 </script>

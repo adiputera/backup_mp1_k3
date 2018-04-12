@@ -1,7 +1,15 @@
 <script>
-	if("${userLogin.id}" == null){
+	var userId = "${userLogin.id}";
+	var outletId = "${outletLogin.id}";
+	var superr = "${superr}";
+	console.log(userId.length);
+	console.log(outletId.length);
+	console.log(superr);
+	if(superr == 1 && outletId.length == 1){
+		
+	}else if(userId.length == 0){
 		window.location = "${pageContext.request.contextPath}/login";
-	}else if("${outletLogin.id}" == null){
+	}else if(outletId.length == 0){
 		window.location = "${pageContext.request.contextPath}/welcome-auth/choose-outlet";
 	}
 </script>
@@ -59,6 +67,9 @@
 <!-- Google Font -->
 <link rel="stylesheet"
 	href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+<!-- jasny bootstrap -->
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/plugins/jasny-bootstrap/css/jasny-bootstrap.css">
 <style type="text/css">
 input.parsley-error {
 	color: #B94A48 !important;
@@ -125,6 +136,8 @@ input.parsley-error {
 	src="${pageContext.request.contextPath}/resources/js/jspdf.min.js"></script>
 <script
 	src="${pageContext.request.contextPath}/resources/easyAutoComplete-1.3.5/jquery.easy-autocomplete.min.js"></script>
+<script
+	src="${pageContext.request.contextPath}/resources/plugins/jasny-bootstrap/js/jasny-bootstrap.js"></script>
 
 <!-- page script -->
 
