@@ -69,7 +69,11 @@
 					</td>
 					<td>${po.supplier.name }</td>
 					<td>${po.poNo }</td>
-					<td>${po.grandTotal }
+					<td>
+						<script>
+							document.write('Rp. ' + ${po.grandTotal }.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+',-');
+						</script>
+					</td>
 					<td>${po.status }</td>
 					<td>
 						<input type="button" class="btn-edit-po btn btn-default" value="Edit" key-id="${po.id }"> | 
@@ -201,8 +205,37 @@
 		function simpan(){
 			var pod = [];
 			var errorCost = [];
+			var totalCost = $('#totalbanget').text();
+			var tc1 = totalCost.split(' ');
+			var tc2 = tc1[1].split(',');
+			var totalnya;
+			for(i = 0; i < tc2.length-1; i++){
+				if(i == 0){
+					totalnya = tc2[0];
+				}else{
+					totalnya = totalnya + tc2[i];
+				}
+			}
 			$('#list-item > tr').each(function(index,data) {
 				var cost = $('#cost'+$(this).attr('key-id')+'').val();
+				/* var cost1 = cost.split(' ');
+				var cost2 = cost1[1].split(',');
+				var costnya;
+				for(i = 1; i < cost2.length-1; i++){
+					costnya = costnya+cost2[i];
+				} */
+				var st = $(this).find('td').eq(4).text();
+				var st1 = st.split(' ');
+				var st2 = st1[1].split(',');
+				var subtotalnya;
+				for(i = 0; i < st2.length-1; i++){
+					if(i == 0){
+						subtotalnya = st2[0];
+					}else{
+						subtotalnya = subtotalnya + st2[i];
+					}
+				}
+				console.log(subtotalnya);
 				if(cost == 0){
 					errorCost.push('#cost'+$(this).attr('key-id'));
 				}
@@ -211,7 +244,7 @@
 						"variant" : {
 							"id" : $(this).attr('key-id')
 						},
-						"subTotal" : $(this).find('td').eq(4).text(),
+						"subTotal" : subtotalnya,
 						"unitCost" : cost
 				};
 				pod.push(detail);
@@ -228,7 +261,7 @@
 				"supplier" : {
 					"id" : $('#pil-supplier').val()
 				},
-				"grandTotal" : $('#totalbanget').text()
+				"grandTotal" : totalnya
 			};
 			
 			var error = errorCost.length;
@@ -281,7 +314,7 @@
 					$('#in-notes').val(data.notes);
 					$('#in-id').val(data.id);
 					$('#in-outlet').val(data.outlet.id);
-					$('#totalbanget').text(data.grandTotal);
+					$('#totalbanget').text('Rp. '+data.grandTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')+',-');
 					if(data.supplier == null){
 						
 					}else{
@@ -293,7 +326,7 @@
 							+'<td id="td'+val.id+'"></td>'
 							+'<td>'+val.requestQty+'</td>'
 							+'<td><input type="number" min="10000" max="10000000000" id="cost'+val.variant.id+'" placeholder="20000" value="'+val.unitCost+'" class="edit-cost form-control"></td>'
-							+'<td id="subtotal'+val.id+'">'+val.subTotal+'</td>'
+							+'<td id="subtotal'+val.id+'">Rp. '+val.subTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')+',-'+'</td>'
 						);
 						$.ajax({
 							type : 'GET',
@@ -325,19 +358,19 @@
 			});
 		});
 		
-		$('#list-item').on('keyup', '.edit-cost',function(e){
+		$('#list-item').on('keyup', '.edit-cost',function(){
 			var cost = parseInt($(this).val());
 			var tr = $(this).parent().parent();
 			var subLoc = tr.find('td').eq(4);
 			var reqQty = parseInt(tr.find('td').eq(2).text());
 			var subTotal = cost*reqQty;
-			subLoc.text(subTotal);
+			subLoc.text('Rp. '+subTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')+',-');
 			var total = 0;
 			$('#list-item > tr').each(function(index,data) {
 				var subtot = parseInt($(this).find('td').eq(4).text());
-				total = total + subtot;
+				total = total + subTotal;
 			});
-			$('#totalbanget').text(total);
+			$('#totalbanget').text('Rp. '+total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+',-');
 		});
 		
 		var ur='';
