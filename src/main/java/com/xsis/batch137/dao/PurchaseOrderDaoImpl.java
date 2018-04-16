@@ -71,6 +71,18 @@ public class PurchaseOrderDaoImpl implements PurchaseOrderDao {
 		return pos.size();
 	}
 	
+	public int CountPOByMonthAndOutlet(int month, int year, Outlet outlet) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from PurchaseOrder where MONTH(createdOn) = :month and YEAR(createdOn) = :year and outlet = :outlet";
+		List<PurchaseOrder> pos = session.createQuery(hql).setParameter("month", month).setParameter("year", year)
+				.setParameter("outlet", outlet).list();
+		if(pos.isEmpty()) {
+			return 0;
+		}
+		return pos.size();
+	}
+	
 	public void approve(long id) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
@@ -103,6 +115,30 @@ public class PurchaseOrderDaoImpl implements PurchaseOrderDao {
 			return pos;
 		}
 	}
+	
+	public List<PurchaseOrder> searchApprovedPO(String search) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from PurchaseOrder where (lower(poNo) like :search or lower(status) like :search or lower(notes) like :search) and status = 'Approved'";
+		List<PurchaseOrder> pos = session.createQuery(hql).setParameter("search", "%"+search.toLowerCase()+"%").list();
+		if(pos.isEmpty()) {
+			return null;
+		}else {
+			return pos;
+		}
+	}
+	
+	public List<PurchaseOrder> searchPOByOutlet(String search, Outlet outlet) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from PurchaseOrder where (lower(poNo) like :search or lower(status) like :search or lower(notes) like :search) and outlet = :outlet";
+		List<PurchaseOrder> pos = session.createQuery(hql).setParameter("search", "%"+search.toLowerCase()+"%").setParameter("outlet", outlet).list();
+		if(pos.isEmpty()) {
+			return null;
+		}else {
+			return pos;
+		}
+	}
 
 	public List<PurchaseOrder> searchPOByDate(Date startDate, Date endDate) {
 		// TODO Auto-generated method stub
@@ -116,7 +152,33 @@ public class PurchaseOrderDaoImpl implements PurchaseOrderDao {
 			return pos;
 		}
 	}
+	
+	public List<PurchaseOrder> searchApprovedPOByDate(Date startDate, Date endDate) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from PurchaseOrder where createdOn >= :start AND createdOn <= :end and status='Approved'";
+		List<PurchaseOrder> pos = session.createQuery(hql).setParameter("start", startDate)
+				.setParameter("end", endDate).list();
+		if(pos.isEmpty()) {
+			return null;
+		}else {
+			return pos;
+		}
+	}
 
+	public List<PurchaseOrder> searchPOByDateAndOutlet(Date startDate, Date endDate, Outlet outlet) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from PurchaseOrder where (createdOn >= :start AND createdOn <= :end) and outlet = :outlet";
+		List<PurchaseOrder> pos = session.createQuery(hql).setParameter("start", startDate)
+				.setParameter("end", endDate).setParameter("outlet", outlet).list();
+		if(pos.isEmpty()) {
+			return null;
+		}else {
+			return pos;
+		}
+	}
+	
 	public List<PurchaseOrder> searchPOByStatus(String search) {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
@@ -129,6 +191,18 @@ public class PurchaseOrderDaoImpl implements PurchaseOrderDao {
 		}
 	}
 
+	public List<PurchaseOrder> searchPOByStatusAndOutlet(String search, Outlet outlet) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from PurchaseOrder where status = :status and outlet = :outlet";
+		List<PurchaseOrder> pos = session.createQuery(hql).setParameter("status", search).setParameter("outlet", outlet).list();
+		if(pos.isEmpty()) {
+			return null;
+		}else {
+			return pos;
+		}
+	}
+	
 	@Override
 	public List<PurchaseOrder> searchPOByOneDate(Date date) {
 		// TODO Auto-generated method stub
@@ -142,6 +216,30 @@ public class PurchaseOrderDaoImpl implements PurchaseOrderDao {
 		}
 	}
 
+	public List<PurchaseOrder> searchApprovedPOByOneDate(Date date) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from PurchaseOrder where to_char(createdOn, 'YYYY/MM/DD') = to_char(:date, 'YYYY/MM/DD') and status = 'Approved'";
+		List<PurchaseOrder> pos = session.createQuery(hql).setParameter("date", date).list();
+		if(pos.isEmpty()) {
+			return null;
+		}else {
+			return pos;
+		}
+	}
+	
+	public List<PurchaseOrder> searchPOByOneDateAndOutlet(Date date, Outlet outlet) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+		String hql = "from PurchaseOrder where to_char(createdOn, 'YYYY/MM/DD') = to_char(:date, 'YYYY/MM/DD') and outlet = :outlet";
+		List<PurchaseOrder> pos = session.createQuery(hql).setParameter("date", date).setParameter("outlet", outlet).list();
+		if(pos.isEmpty()) {
+			return null;
+		}else {
+			return pos;
+		}
+	}
+	
 	@Override
 	public List<PurchaseOrder> getPOByOutlet(Outlet outlet) {
 		// TODO Auto-generated method stub
@@ -158,7 +256,7 @@ public class PurchaseOrderDaoImpl implements PurchaseOrderDao {
 	public int CountApprovedPo() {
 		// TODO Auto-generated method stub
 		Session session = sessionFactory.getCurrentSession();
-		String hql = "from PurchaseOrder where status = 'Submitted'";
+		String hql = "from PurchaseOrder where status = 'Approved'";
 		int jml = session.createQuery(hql).list().size();
 		return jml;
 	}	

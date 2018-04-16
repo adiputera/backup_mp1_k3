@@ -1,7 +1,7 @@
 <%@ include file="/WEB-INF/view/masterPage/layout.jsp"%>
 <section class="content">
 <div class="box content">
-	<h3>Purchase Order</h3>
+	<h3>Sales Order</h3>
 	<hr style="border-color:black;">
 	<div class="row">
 		<div class="col-xs-3">
@@ -16,9 +16,7 @@
 	    </div>
 	    
 	    <div class="col-xs-3">
-		    <div class="form-group">
-		    	<input type="text" id="cari-pr" class="form-control" placeholder="Search...">
-		    </div>
+		    
 	    </div>
 	    
 	    <div class="col-xs-2">
@@ -32,21 +30,19 @@
 	    </div>
 	</div>
 	<hr>
-	<table id="data-po" class="table table-striped table-bordered table-hover">
+	<table id="data-so" class="table table-striped table-bordered table-hover">
 		<thead class="thead-light">
 			<th>Create Date</th>
-			<th>Supplier</th>
-			<th>PO No.</th>
+			<th>Customer</th>
 			<th>Total</th>
-			<th>Status</th>
 			<th>#</th>
 		</thead>
-		<tbody id="isi-data-po">
-			<c:forEach items="${pos }" var="po">
+		<tbody id="isi-data-so">
+			<c:forEach items="${sos }" var="so">
 				<tr>
 					<td>
 						<script>
-							var waktu = '${po.createdOn}';
+							var waktu = '${so.createdOn}';
 							var wkt = waktu.split('.');
 							var tanggalJam = wkt[0].split(' ');
 							var tgl = tanggalJam[0].split('-');
@@ -54,17 +50,15 @@
 							document.write(tanggal+' '+tanggalJam[1]);
 						</script>
 					</td>
-					<td>${po.supplier.name }</td>
-					<td>${po.poNo }</td>
+					<td>${so.customer.name }</td>
 					<td>
 						<script>
-							var gt = "${po.grandTotal }";
-							document.write('Rp. ' + String(gt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."))+',-');
+							var gt = "${so.grandTotal }";
+							document.write('Rp. ' + gt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+',-');
 						</script>
 					</td>
-					<td>${po.status }</td>
 					<td>
-						<a href='${pageContext.request.contextPath}/dashboard/detail/po/${po.id}' class="btn-view-pr btn btn-info" key-id="${pr.id }">View</a>
+						<a href='#' class="btn-view-pr btn btn-info" key-id="${so.id }">View</a>
 					</td>
 				</tr>
 			</c:forEach>
@@ -130,21 +124,10 @@
 			});
 		}
 		
-		$('#cari-pr').on('keyup', function(){
-			var word = $(this).val();
-			if (word=="") {
-				ur = '${pageContext.request.contextPath}/transaksi/purchase-order/get-all';
-				search();
-			} else {
-				ur = '${pageContext.request.contextPath}/transaksi/purchase-order/search?search='+word;
-				search();
-			}
-		});
-		
-		$('#data-po').DataTable({
+		$('#data-so').DataTable({
 			'paging' : true,
 			'lengthChange' : false,
-			'searching' : false,
+			'searching' : true,
 			'ordering' : true,
 			'info' : true,
 			'autoWidth' : false

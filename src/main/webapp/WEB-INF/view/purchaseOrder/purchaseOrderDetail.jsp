@@ -13,29 +13,30 @@
 						+'<option disabled selected>More</option>'
 						+'<option value="approve">Approve</option>'
 						+'<option value="reject">Reject</option>'
-						+'<option value="process" disabled>Process</option>'
 						+'<option value="print">Print</option>');
 			}else if('${po.status}' == 'Rejected'){
 				document.write('<select id="action-po" class="btn-primary form-control no-print" key-id="${po.id }">'
 						+'<option disabled selected>More</option>'
 						+'<option value="approve" disabled>Approve</option>'
 						+'<option value="reject" disabled>Reject</option>'
-						+'<option value="process" disabled>Process</option>'
 						+'<option value="print">Print</option>');
 			}else if('${po.status}' == 'Processed'){
 				document.write('<select id="action-po" class="btn-poimary form-control no-print" key-id="${po.id }">'
 						+'<option disabled selected>More</option>'
 						+'<option value="approve" disabled>Approve</option>'
 						+'<option value="reject" disabled>Reject</option>'
-						+'<option value="process" disabled>Process</option>'
 						+'<option value="print">Print</option>');
 			}else if('${po.status}' == 'Approved'){
 				document.write('<select id="action-po" class="btn-primary form-control no-print" key-id="${po.id }">'
 						+'<option disabled selected>More</option>'
 						+'<option value="approve" disabled>Approve</option>'
 						+'<option value="reject" disabled>Reject</option>'
-						+'<option value="process">Process</option>'
 						+'<option value="print">Print</option>');
+			}
+			if("${superr}" == 1 || "${userLogin.role.name}" == 'ROLE_ADMIN'){
+				document.write('<option value="process">Process</option>');
+			}else{
+				document.write('<option value="process" disabled>Process</option>');
 			}
 		</script>
 			
@@ -146,22 +147,25 @@
 				<td>${pod.requestQty }</td>
 				<td>
 					<script>
-						document.write('Rp. ' + ${pod.unitCost }.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+',-');
+						var ucost = "${pod.unitCost }";
+						document.write('Rp. ' + ucost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+',-');
 					</script>
 				</td>
 				<td>
 					<script>
-						document.write('Rp. ' + ${pod.subTotal }.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+',-');
+						var subtot = "${pod.subTotal }";
+						document.write('Rp. ' + subtot.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+',-');
 					</script>
 				</td>
 			</tr>
 		</c:forEach>
 		<tfoot>
-			<tr style="border-bottom:black dashed 1px;">
-				<td colspan="4" style="border-bottom:black dashed 1px;"><strong>TOTAL</strong></td>
-				<td style="border-bottom:black dashed 1px;">
+			<tr style="border-bottom:black dashed 1px">
+				<td colspan="4"><strong>TOTAL</strong></td>
+				<td>
 					<script>
-						document.write('Rp. ' + ${po.grandTotal }.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+',-');
+						var gt = "${po.grandTotal }"
+						document.write('Rp. ' + gt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+',-');
 					</script>
 				</td>
 			</tr>
@@ -170,13 +174,24 @@
 </table>
 <div class="row">
 	<div class="col-xs-9"></div>
-	<div class="col-xs-3"><a href="${pageContext.request.contextPath}/transaksi/purchase-order" class="btn btn-primary btn-block no-print">Done</a></div>
+	<div class="col-xs-3"><button type="button" class="btn btn-primary btn-block no-print" id="btn-done">Done</button></div>
 </div>
 </div>
 </section>
 </body>
 <script>
 	$(function(){
+		
+		var pathname = window.location.pathname;
+		var sumber = pathname.split('/')[2];
+		
+		$('#btn-done').on('click', function(){
+			if(sumber == 'transaksi'){
+				window.location = '${pageContext.request.contextPath}/transaksi/purchase-order';
+			}else{
+				window.location = '${pageContext.request.contextPath}/dashboard/po';
+			}
+		});
 		
 		$('#action-po').change(function(){
 			var action = $(this).val();
@@ -196,7 +211,7 @@
 					}
 				});
 			}
-		});
+		})
 	})
 </script>
 </html>
