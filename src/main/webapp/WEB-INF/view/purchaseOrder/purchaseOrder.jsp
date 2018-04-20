@@ -228,12 +228,6 @@
 			}
 			$('#list-item > tr').each(function(index,data) {
 				var cost = $('#cost'+$(this).attr('key-id')+'').val();
-				/* var cost1 = cost.split(' ');
-				var cost2 = cost1[1].split(',');
-				var costnya;
-				for(i = 1; i < cost2.length-1; i++){
-					costnya = costnya+cost2[i];
-				} */
 				var st = $(this).find('td').eq(4).text();
 				var st1 = st.split(' ');
 				var st2 = st1[1].split(',');
