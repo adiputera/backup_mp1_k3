@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>Kelompok 3</title>
+<title>Login - POS Kelompok 3</title>
 <!-- Tell the browser to be responsive to screen width -->
 <meta
 	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
@@ -143,7 +143,7 @@
 	      </div>
 	      <div class="row">
 	        <div class="col-xs-8">
-	         
+	         	<small><a data-toggle="modal" data-target="#modal-forgot">Forgot Password?</a></small>
 	        </div>
 	        <!-- /.col -->
 	        <div class="col-xs-4">
@@ -157,5 +157,201 @@
 	  <!-- /.login-box-body -->
 	</div>
 	<!-- /.login-box -->
+	
+	<!-- forgot password -->
+	<div class="modal fade" id="modal-forgot" role="dialog">
+		<div class="modal-dialog modal-sm">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<div class="row" id="div-alert" style="display:none;">
+						<div class="col-xs-12">
+							<div class="alert alert-sukses" role="alert" id="tampilan-alert">
+							  <strong>Sukses!</strong> Data Berhasil Disimpan.
+							</div>
+						</div>
+					</div>
+					<button type="button" class="close modalcancel" data-dismiss="modal">&times;</button>
+					<h3 id="judul-modal">Change Password</h3>
+				</div>
+				
+				<div class="modal-body">
+					<div class="form-group has-feedback" id="div-email">
+						<h4>Email :</h4> 
+						<label class="control-label" for="in-email" style="display:none" id="lbl-email"><i class="fa fa-check"></i></label>
+						<input type="email" class="form-control" id="in-email" placeholder="email" name="in-email"/>
+					</div>
+					
+					<div class="form-group has-feedback" id="div-password">
+						<h4>New Password :</h4>
+						<label class="control-label" for="in-password" style="display:none" id="lbl-password"><i class="fa fa-check"></i></label>
+						<input type="password" class="form-control full-span" id="in-password" placeholder="new password"/>
+					</div>
+					
+					<div class=form-group has-feedback" id="div-repassword">
+						<h4>Re-type Password :</h4>
+						<label class="control-label" for="in-repassword" style="display:none" id="lbl-repassword"><i class="fa fa-check"></i></label>
+						<input type="password" class="form-control full-span" id="in-repassword" placeholder="re-type password"/>
+					</div>
+				</div>
+				
+				<div class="modal-footer">
+					<div class="row">
+						<div class="col-xs-9">
+						
+						</div>
+						<div class="col-xs-2">
+							<button type="button" class="btn btn-info" id="tbl-pswd">Save</button>
+						</div>
+						<div class="col-xs-1">
+						
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
+<script>
+	$(function(){
+		
+		var password = '';
+		var email = '';
+		var repassword = '';
+		
+		var eValid = 0;
+		var pValid = 0;
+		var rpValid = 0;
+		
+		$('#tbl-pswd').on('click', function(){
+			if(eValid == 1 && pValid == 1 && rpValid == 1){
+				$.ajax({
+					type : 'get',
+					url : '${pageContext.request.contextPath}/login/ubah-password?password='+password+'&email='+email,
+					success : function(data) {
+						console.log(data);
+						if(data == 0){
+							// ga ada emailnya
+							$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
+							$('#tampilan-alert').html('<strong>Error!</strong> Gagal mengubah password');
+							$('#div-alert').fadeIn();
+							$('#div-email').removeClass('has-success').addClass('has-error');
+							$('#lbl-email').html('<i class="fa fa-times-circle-o"></i> Email not found');
+							$('#lbl-email').fadeIn();
+						}else if(data == 1){
+							$('#tampilan-alert').removeClass('alert-gagal').addClass('alert-sukses');
+							$('#tampilan-alert').html('<strong>Sukses!</strong> Password berhasil diubah');
+							$('#div-alert').fadeIn();
+							setTimeout(function() {
+								$('#modal-forgot').modal('hide');
+								$('#in-email').val('');
+								$('#in-password').val('');
+								$('#in-repassword').val('');
+								$('#div-alert').fadeOut();
+							}, 2000);
+							$('#div-email').removeClass('has-success').removeClass('has-error');
+							$('#lbl-email').fadeOut();
+							$('#div-password').removeClass('has-success').removeClass('has-error');
+							$('#lbl-password').fadeOut();
+							$('#div-repassword').removeClass('has-success').removeClass('has-error');
+							$('#lbl-repassword').fadeOut();
+						}else if(data == 2){
+							// user tidak aktif
+							$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
+							$('#tampilan-alert').html('<strong>Error!</strong> Gagal mengubah password');
+							$('#div-alert').fadeIn();
+							$('#div-email').removeClass('has-success').addClass('has-error');
+							$('#lbl-email').html('<i class="fa fa-times-circle-o"></i> User not active');
+							$('#lbl-email').fadeIn();
+							setTimeout(function(){
+								$('#div-alert').fadeOut();
+							}, 4000);
+						}else{
+							// ga punya user
+							$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
+							$('#tampilan-alert').html('<strong>Error!</strong> Gagal mengubah password');
+							$('#div-alert').fadeIn();
+							$('#div-email').removeClass('has-success').addClass('has-error');
+							$('#lbl-email').html('<i class="fa fa-times-circle-o"></i> User not found');
+							$('#lbl-email').fadeIn();
+							setTimeout(function(){
+								$('#div-alert').fadeOut();
+							}, 4000);
+						}
+					},
+					error : function() {
+						$('#tampilan-alert').removeClass('alert-sukses').addClass('alert-gagal');
+						$('#tampilan-alert').html('<strong>Error!</strong> Gagal mengubah password');
+						$('#div-alert').fadeIn();
+						setTimeout(function(){
+							$('#div-alert').fadeOut();
+						}, 4000);
+					}
+				});
+			}
+			if(eValid == 0){
+				$('#div-email').removeClass('has-success').addClass('has-error');
+				$('#lbl-email').html('<i class="fa fa-times-circle-o"></i> Email not valid');
+				$('#lbl-email').fadeIn();
+			}
+			if(pValid == 0){
+				$('#div-password').removeClass('has-success').addClass('has-error');
+				$('#lbl-password').html('<i class="fa fa-times-circle-o"></i> > 6 characters');
+				$('#lbl-password').fadeIn();
+			}
+			if(rpValid == 0){
+				$('#div-repassword').removeClass('has-success').addClass('has-error');
+				$('#lbl-repassword').html('<i class="fa fa-times-circle-o"></i> Password did not match');
+				$('#lbl-repassword').fadeIn();
+			}
+			
+		});
+		
+		$('#in-password').on('input', function(){
+			password = $(this).val();
+			if(password.length > 6){
+				$('#div-password').removeClass('has-error').addClass('has-success');
+				$('#lbl-password').html('<i class="fa fa-check"></i> Ok');
+				$('#lbl-password').fadeIn();
+				pValid = 1;
+			}else{
+				$('#div-password').removeClass('has-success').addClass('has-error');
+				$('#lbl-password').html('<i class="fa fa-times-circle-o"></i> > 6 characters');
+				$('#lbl-password').fadeIn();
+				pValid = 0;
+			}
+			if(password.length > 6){
+				$('#in-repassword').trigger('input');
+			}
+		});
+		
+		$('#in-repassword').on('input', function(){
+			repassword = $(this).val();
+			if(repassword == password){
+				$('#div-repassword').removeClass('has-error').addClass('has-success');
+				$('#lbl-repassword').html('<i class="fa fa-check"></i> Ok');
+				$('#lbl-repassword').fadeIn();
+				rpValid = 1;
+			}else{
+				$('#div-repassword').removeClass('has-success').addClass('has-error');
+				$('#lbl-repassword').html('<i class="fa fa-times-circle-o"></i> Password did not match');
+				$('#lbl-repassword').fadeIn();
+				rpValid = 0;
+			}
+		})
+		
+		$('#in-email').on('input',function(){
+			$('#div-email').removeClass('has-success').removeClass('has-error');
+			$('#lbl-email').fadeOut();
+			email = $(this).val();
+			var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+			var valid =  regex.test(email);
+			if(valid){
+				eValid = 1;
+			}else{
+				eValid = 0;
+			}
+		});
+	})
+</script>
 </html>
